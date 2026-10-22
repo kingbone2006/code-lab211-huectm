@@ -54,27 +54,12 @@ Hầu hết các bài Lab trong dự án được tổ chức theo chuẩn kiế
 - **JDK**: Java Development Kit phiên bản 8 trở lên (Khuyến nghị JDK 8, 11 hoặc 17).
 - **IDE**: NetBeans IDE (8.2 / 12 / 17+), IntelliJ IDEA, Eclipse hoặc VS Code.
 
-### Cách 1: Mở Bằng NetBeans IDE (Khuyến Nghị)
+###Mở Bằng NetBeans IDE 
 1. Khởi động **NetBeans IDE**.
 2. Chọn `File` -> `Open Project...`.
-3. Trỏ tới thư mục của bài lab cần mở (ví dụ: `D:\code lab\J1.L.P0021_StudentManagement`).
+3. Trỏ tới thư mục của bài lab cần mở 
 4. Nhấn **F6** (hoặc `Run Project`) để thực thi chương trình.
 
-### Cách 2: Chạy Qua Command Line / Terminal
-1. Mở Terminal / PowerShell tại thư mục `src` của bài lab tương ứng:
-   ```bash
-   cd "D:\code lab\J1.L.P0021_StudentManagement\src"
-   ```
-2. Biên dịch mã nguồn:
-   ```bash
-   javac ui/Main.java
-   ```
-3. Chạy chương trình:
-   ```bash
-   java ui.Main
-   ```
-
----
 
 ## 📁 Tài Liệu Bổ Sung
 - Thư mục [`de bai`](./de%20bai): Chứa file `.docx` và file trích xuất `.txt` đề bài gốc của từng lab.
