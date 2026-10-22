@@ -1,0 +1,21 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package data;
+
+import entity.Account;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Data {
+
+    public static List<Account> listAccount = new ArrayList<Account>() {
+        {
+            add(new Account("1111111111", "Matkhau123"));
+            add(new Account("1111111112", "Matkhau456"));
+
+        }
+    };
+}

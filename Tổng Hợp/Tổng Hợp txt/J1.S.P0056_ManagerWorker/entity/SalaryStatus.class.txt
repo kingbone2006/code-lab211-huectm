@@ -1,0 +1,31 @@
+// ============================================================
+// File: SalaryStatus.class.txt
+// Project: J1.S.P0056_ManagerWorker
+// Package: entity
+// Mô tả: Mã nguồn Java (dạng text) — có comment giải thích phương thức.
+// ============================================================
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package entity;
+
+public enum SalaryStatus {
+    UP, DOWN;
+
+    /**
+     * Getter: trả về giá trị thuộc tính UP.
+     */
+    public static SalaryStatus getUP() {
+        return UP;
+    }
+
+    /**
+     * Getter: trả về giá trị thuộc tính DOWN.
+     */
+    public static SalaryStatus getDOWN() {
+        return DOWN;
+    }
+}

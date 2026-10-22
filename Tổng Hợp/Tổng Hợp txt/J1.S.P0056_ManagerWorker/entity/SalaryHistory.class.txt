@@ -1,0 +1,119 @@
+// ============================================================
+// File: SalaryHistory.class.txt
+// Project: J1.S.P0056_ManagerWorker
+// Package: entity
+// Mô tả: Mã nguồn Java (dạng text) — có comment giải thích phương thức.
+// ============================================================
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package entity;
+
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class SalaryHistory implements Comparable<SalaryHistory>, Serializable {
+
+    private String workerID;
+    private double salaryUpdate;
+    private SalaryStatus status;
+    private Date date;
+
+    /**
+     * Constructor: khởi tạo đối tượng SalaryHistory.
+     */
+    public SalaryHistory() {
+    }
+
+    /**
+     * Constructor: khởi tạo đối tượng SalaryHistory.
+     */
+    public SalaryHistory(String workerID, double salaryUpdate, SalaryStatus status, Date date) {
+        this.workerID = workerID;
+        this.salaryUpdate = salaryUpdate;
+        this.status = status;
+        this.date = date;
+    }
+
+    /**
+     * Getter: trả về giá trị thuộc tính WorkerID.
+     */
+    public String getWorkerID() {
+        return workerID;
+    }
+
+    /**
+     * Setter: gán giá trị cho thuộc tính WorkerID.
+     */
+    public void setWorkerID(String workerID) {
+        this.workerID = workerID;
+    }
+
+    /**
+     * Getter: trả về giá trị thuộc tính SalaryUpdate.
+     */
+    public double getSalaryUpdate() {
+        return salaryUpdate;
+    }
+
+    /**
+     * Setter: gán giá trị cho thuộc tính SalaryUpdate.
+     */
+    public void setSalaryUpdate(double salaryUpdate) {
+        // Kiểm tra lương có lớn hơn 0 không
+        if (salaryUpdate <= 0) {
+            throw new IllegalArgumentException("Invalid Salary. Salary must be a positive number.");
+        }
+        this.salaryUpdate = salaryUpdate;
+    }
+
+    /**
+     * Lấy trạng thái.
+     */
+    public SalaryStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * Gán trạng thái.
+     */
+    public void setStatus(SalaryStatus status) {
+        this.status = status;
+    }
+
+    /**
+     * Lấy ngày.
+     */
+    public Date getDate() {
+        return date;
+    }
+
+    /**
+     * Gán ngày.
+     */
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    @Override
+    /**
+     * Chuyển đối tượng thành chuỗi để hiển thị.
+     */
+    public String toString() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        return "SalaryHistory{" + workerID + ", " + salaryUpdate + ", " + status + ", " + dateFormat.format(date) + '}';
+    }
+
+    @Override
+    /**
+     * So sánh đối tượng này với đối tượng khác (dùng khi sort).
+     */
+    public int compareTo(SalaryHistory o) {
+        return workerID.compareTo(o.workerID);
+    }
+
+}

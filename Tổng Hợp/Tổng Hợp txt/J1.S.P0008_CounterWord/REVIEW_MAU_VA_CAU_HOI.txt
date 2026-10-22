@@ -1,0 +1,359 @@
+================================================================================
+  REVIEW BÀI: J1.S.P0008 — Counter Word / Character
+  Thư mục txt: Tổng Hợp txt / J1.S.P0008_CounterWord
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+A. GIỚI THIỆU NHANH
+────────────────────────────────────────────────────────────────────────────────
+
+"Bài đếm số lần xuất hiện của từng từ và từng ký tự trong chuỗi người dùng nhập.
+model.ContentProcessor chứa logic đếm; validate.Validator nhập chuỗi có regex;
+ui.Main tạo processor rồi in wordCount() và charCount().
+Đếm từ dùng StringTokenizer (tách token) + LinkedHashMap (key=từ, value=số lần)."
+
+
+────────────────────────────────────────────────────────────────────────────────
+B. CẤU TRÚC
+────────────────────────────────────────────────────────────────────────────────
+
+model/ContentProcessor.class.txt   — wordCount, charCount, setInput, inputstr
+validate/Validator.class.txt       — getString + REGEX
+ui/Main.class.txt                  — gọi wordCount / charCount và in
+
+
+────────────────────────────────────────────────────────────────────────────────
+C. LUỒNG
+────────────────────────────────────────────────────────────────────────────────
+
+Main
+  → new ContentProcessor()
+       → constructor / setInput / (inputstr qua Validator — xem code thực tế)
+  → process.wordCount()  → Map từ → số lần
+  → process.charCount()  → Map ký tự → số lần (bỏ space)
+  → System.out.println map
+
+
+────────────────────────────────────────────────────────────────────────────────
+D. HASHMAP / LINKEDHASHMAP + TOKEN (★ giải thích kỹ)
+────────────────────────────────────────────────────────────────────────────────
+
+### 1) Token là gì?
+
+Token = một “mảnh” nhỏ tách ra từ chuỗi lớn.
+
+Ví dụ input:
+  "hello world hello java"
+
+StringTokenizer tách theo khoảng trắng (mặc định) thành:
+
+  Lần 1 → "hello"
+  Lần 2 → "world"
+  Lần 3 → "hello"
+  Lần 4 → "java"
+
+Mỗi mảnh đó gọi là một TOKEN (trong bài ≈ một TỪ).
+
+
+### 2) StringTokenizer trong code
+
+  StringTokenizer Tokenstr = new StringTokenizer(input);
+  while (Tokenstr.hasMoreTokens()) {
+      String tokens = Tokenstr.nextToken();   // lấy 1 token
+      // ... đưa vào Map để đếm
+  }
+
+  | Method              | Ý nghĩa                                      |
+  |---------------------|----------------------------------------------|
+  | hasMoreTokens()     | Còn token chưa lấy không?                    |
+  | nextToken()         | Lấy token tiếp theo                          |
+
+  Delimiter mặc định: space, tab, xuống dòng...
+  → Không cần tự split; Tokenizer lo việc cắt từ.
+
+
+### 3) Map / HashMap / LinkedHashMap là gì?
+
+Map = cấu trúc KEY → VALUE (khóa → giá trị).
+
+Trong wordCount:
+  Key   = token (String — từ)
+  Value = Integer — số lần xuất hiện
+
+Ví dụ sau khi đếm "hello world hello":
+  hello → 2
+  world → 1
+
+  |                    | HashMap              | LinkedHashMap (bài dùng)     |
+  |--------------------|----------------------|------------------------------|
+  | Lưu key-value      | Có                   | Có                           |
+  | Tra cứu nhanh      | Gần O(1)             | Gần O(1)                     |
+  | Thứ tự khi in      | Không đảm bảo        | Giữ thứ tự CHÈN (lần đầu)    |
+
+  Code:
+    Map<String, Integer> wordCounter = new LinkedHashMap<>();
+
+  Vì sao LinkedHashMap?
+  → Khi println map, từ in theo thứ tự xuất hiện lần đầu trong câu,
+    dễ đọc hơn HashMap thuần.
+
+
+### 4) Logic đếm: token + Map (wordCount)
+
+  public Map wordCount() throws Exception {
+      Map<String, Integer> wordCounter = new LinkedHashMap<>();
+      StringTokenizer Tokenstr = new StringTokenizer(input);
+      while (Tokenstr.hasMoreTokens()) {
+          String tokens = Tokenstr.nextToken();
+          if (!wordCounter.containsKey(tokens)) {
+              wordCounter.put(tokens, 1);                    // lần đầu
+          } else {
+              wordCounter.put(tokens, wordCounter.get(tokens) + 1);  // +1
+          }
+      }
+      return wordCounter;
+  }
+
+  API Map dùng trong bài:
+
+  | Method                | Ý nghĩa                              |
+  |-----------------------|--------------------------------------|
+  | containsKey(key)      | Đã có key (từ) này chưa?             |
+  | put(key, value)       | Gán / ghi đè value cho key           |
+  | get(key)              | Lấy value hiện tại                   |
+  | get(key) + 1          | Tăng bộ đếm                          |
+
+
+### 4b) put(..., 1) — số 1 nghĩa là gì? (★ hay hỏi)
+
+  --- wordCounter.put(tokens, 1) ---
+
+    wordCounter.put(tokens, 1);
+    //              │       │
+    //              │       └── value (Integer) = SỐ LẦN XUẤT HIỆN
+    //              └── key (String) = từ / token vừa tách
+
+    Số 1 = lần ĐẦU gặp từ này → gán bộ đếm = 1 (xuất hiện 1 lần).
+
+    | Tình huống              | Code                                      | Ý nghĩa                |
+    |-------------------------|-------------------------------------------|------------------------|
+    | Lần đầu thấy token      | put(tokens, 1)                            | Từ mới → đếm 1         |
+    | Đã có trong map         | put(tokens, get(tokens) + 1)              | Tăng thêm 1 lần        |
+
+    1 KHÔNG phải index, KHÔNG phải độ dài token.
+    1 chỉ là số lần xuất hiện BAN ĐẦU của từ đó trong câu.
+
+    Ví dụ "hello world hello":
+      "hello" lần 1 → put("hello", 1)  → hello xuất hiện 1 lần
+      "world"       → put("world", 1)  → world xuất hiện 1 lần
+      "hello" lần 2 → put("hello", 2)  → get(1)+1
+
+
+  --- charCounter.put(ch, 1) ---
+
+    charCounter.put(ch, 1);
+    //              │   │
+    //              │   └── value = SỐ LẦN XUẤT HIỆN của ký tự
+    //              └── key = ký tự (Character), vd 'h', 'e', 'l'
+
+    Số 1 = lần ĐẦU gặp ký tự ch → gán bộ đếm = 1.
+
+    if (!charCounter.containsKey(ch)) {
+        charCounter.put(ch, 1);                      // lần đầu → đếm 1
+    } else {
+        charCounter.put(ch, charCounter.get(ch) + 1); // gặp lại → 2, 3, ...
+    }
+
+    1 KHÔNG phải mã ASCII, KHÔNG phải vị trí trong chuỗi.
+    1 chỉ là số lần đếm ban đầu khi ký tự xuất hiện lần đầu.
+
+    Ví dụ "hi hi" (bỏ space):
+      'h' → put('h', 1)     map = {h=1}
+      'i' → put('i', 1)     map = {h=1, i=1}
+      'h' → put('h', 2)     map = {h=2, i=1}
+      'i' → put('i', 2)     map = {h=2, i=2}
+
+
+  --- So sánh nhanh ---
+
+    |                         | wordCounter.put(tokens, 1)     | charCounter.put(ch, 1)          |
+    |-------------------------|--------------------------------|---------------------------------|
+    | Key                     | từ ("hello")                   | ký tự ('h')                     |
+    | Số 1 nghĩa là           | từ đó xuất hiện 1 lần (lần đầu)| ký tự đó xuất hiện 1 lần (lần đầu)|
+
+  Nói 1 câu khi review:
+    "put(key, 1) — value 1 nghĩa là bộ đếm bắt đầu từ 1 vì đây là lần đầu
+     gặp từ/ký tự đó; lần sau thì get + 1."
+
+
+### 5) Chạy tay ví dụ "hello world hello"
+
+  Bắt đầu: map = {}
+
+  Token "hello"
+    containsKey? KHÔNG → put("hello", 1)
+    map = {hello=1}
+
+  Token "world"
+    containsKey? KHÔNG → put("world", 1)
+    map = {hello=1, world=1}
+
+  Token "hello"
+    containsKey? CÓ → get=1 → put("hello", 2)
+    map = {hello=2, world=1}
+
+  Kết quả in: {hello=2, world=1}
+
+
+### 6) Sơ đồ tổng quát
+
+  input string
+       │
+       ▼
+  StringTokenizer  ──►  token1, token2, token3, ...
+       │
+       ▼  với MỖI token
+  ┌──────────────────────────────────┐
+  │  LinkedHashMap                   │
+  │  key   = token (từ)              │
+  │  value = số lần đếm              │
+  │                                  │
+  │  chưa có key → put(key, 1)       │
+  │  đã có key   → put(key, cũ + 1)  │
+  └──────────────────────────────────┘
+
+
+### 7) charCount — cùng ý Map, KHÔNG dùng token
+
+  for (char ch : input.toCharArray()) {
+      if (Character.isSpaceChar(ch)) continue;   // bỏ space
+      // containsKey / put 1 / put +1  giống wordCount
+  }
+
+  |                | wordCount                    | charCount                      |
+  |----------------|------------------------------|--------------------------------|
+  | Đơn vị đếm     | Token (từ)                   | Ký tự (char)                   |
+  | Cách tách      | StringTokenizer              | toCharArray()                  |
+  | Key map        | String                       | Character                      |
+  | Bỏ space?      | Tokenizer tách theo space    | isSpaceChar → skip             |
+  | Cấu trúc lưu   | LinkedHashMap                | LinkedHashMap                  |
+
+
+### 8) Tóm một câu (nói khi review)
+
+  "Tokenizer cắt câu thành từng token (từ); mỗi token đưa vào Map:
+   key = từ, value = số lần xuất hiện — đó là cách đếm từ bằng
+   LinkedHashMap + token."
+
+
+────────────────────────────────────────────────────────────────────────────────
+E. METHOD KHÁC — CHỈ ĐOẠN CODE / Ý NGHĨA
+────────────────────────────────────────────────────────────────────────────────
+
+setInput(String):
+  - null → throw "Can't be null"
+  - trim empty → throw "Input can't be empty"
+  - gán this.input
+
+inputstr():
+  - Validator.getString(..., REGEX "^(?!\\s*$).+")
+  - Bắt nhập chuỗi không rỗng / không chỉ khoảng trắng
+
+Validator.getString(msg, err, REGEX):
+  - Lặp do-while đến khi str.matches(REGEX)
+  - Sai → in messageError, nhập lại
+
+
+────────────────────────────────────────────────────────────────────────────────
+F. CÂU HỎI + ĐÁP ÁN
+────────────────────────────────────────────────────────────────────────────────
+
+Q1. Token là gì?
+A: Một mảnh chuỗi do StringTokenizer tách ra từ input (trong bài = một từ).
+
+Q2. StringTokenizer làm gì? hasMoreTokens / nextToken?
+A: Tách chuỗi thành token theo delimiter mặc định (space, tab, newline).
+   hasMoreTokens: còn token không; nextToken: lấy token tiếp theo.
+
+Q3. Map dùng để làm gì trong bài?
+A: Lưu key = từ/ký tự, value = số lần xuất hiện — đếm nhanh, gọn.
+
+Q4. Vì sao dùng LinkedHashMap không dùng HashMap?
+A: LinkedHashMap giữ thứ tự chèn — in kết quả theo thứ tự từ/ký tự
+   xuất hiện lần đầu. HashMap không đảm bảo thứ tự.
+
+Q5. containsKey + put trong wordCount hoạt động thế nào?
+A: Chưa có key → put(token, 1). Đã có → put(token, get(token)+1).
+
+Q5b. put(tokens, 1) / put(ch, 1) — số 1 nghĩa là gì?
+A: Value = số lần xuất hiện. Số 1 = lần ĐẦU gặp từ/ký tự đó → đếm bắt đầu = 1.
+   Không phải index, không phải độ dài token, không phải mã ASCII.
+   Lần sau: put(key, get(key) + 1) → 2, 3, 4...
+
+Q6. wordCount và charCount khác nhau thế nào?
+A: wordCount đếm token (từ) bằng Tokenizer; charCount đếm từng ký tự
+   bằng toCharArray, bỏ space. Cả hai đều dùng LinkedHashMap.
+
+Q7. charCount có dùng StringTokenizer không?
+A: Không. Duyệt char; Tokenizer chỉ dùng trong wordCount.
+
+Q8. Validator nằm package nào? Method nào?
+A: package validate; getString với REGEX.
+
+Q9. Input rỗng xử lý ra sao?
+A: setInput throw "Input can't be empty" hoặc getString không match regex.
+
+Q10. Map raw (không generic) có vấn đề gì?
+A: Mất type-safety, dễ warning; nên Map<String,Integer> /
+   Map<Character,Integer>. (Điểm có thể cải thiện.)
+
+Q11. Main in gì?
+A: In 2 map: kết quả wordCount và charCount.
+
+Q12. Độ phức tạp wordCount?
+A: O(n) với n ≈ số token / độ dài xử lý — mỗi token thao tác Map ~ O(1).
+
+Q13. Hai từ "Hello" và "hello" có bị đếm chung không?
+A: Không (trừ khi tự toLowerCase). Key phân biệt hoa thường: "Hello" ≠ "hello".
+
+Q14. Constructor ContentProcessor gọi setInput(input) khi input chưa gán?
+A: field input mặc định null → setInput(null) có thể throw.
+   Flow thực tế nên gọi inputstr() trước khi đếm — giải thích đúng code đang chạy.
+
+
+────────────────────────────────────────────────────────────────────────────────
+G. CHỈ ĐOẠN CODE HAY HỎI
+────────────────────────────────────────────────────────────────────────────────
+
+  Hỏi                              | Chỗ chỉ
+  ---------------------------------|------------------------------------------
+  Tách token                       | StringTokenizer + hasMoreTokens/nextToken
+  Đếm từ (Map)                     | wordCount: containsKey / put / get+1
+  Đếm ký tự                        | charCount: toCharArray + skip space
+  LinkedHashMap khai báo           | new LinkedHashMap<>()
+  Validate chuỗi                   | Validator.getString + REGEX
+  setInput null/empty              | setInput throw Exception
+
+
+────────────────────────────────────────────────────────────────────────────────
+H. SCRIPT NÓI NHANH (~25 giây)
+────────────────────────────────────────────────────────────────────────────────
+
+"Bài em đếm từ và ký tự. Với từ: StringTokenizer cắt input thành từng token,
+mỗi token là một từ. Em đưa vào LinkedHashMap — key là từ, value là số lần.
+Lần đầu gặp put 1, gặp lại thì get cộng 1. LinkedHashMap để giữ thứ tự xuất
+hiện. Còn ký tự thì duyệt char, bỏ space, cùng logic Map."
+
+
+────────────────────────────────────────────────────────────────────────────────
+I. CHECKLIST DEMO
+────────────────────────────────────────────────────────────────────────────────
+
+[ ] Nhập câu có từ lặp (vd: hello world hello) → wordCount hello=2
+[ ] charCount bỏ space, đếm đúng chữ
+[ ] Giải thích được: token, LinkedHashMap, containsKey/put
+[ ] Chỉ được wordCount khi hỏi "đếm từ ở đâu?"
+[ ] Nói được khác wordCount vs charCount
+
+
+================================================================================

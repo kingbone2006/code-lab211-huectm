@@ -1,0 +1,80 @@
+// ============================================================
+// File: Validator.class.txt
+// Project: J1.S.P0052_ManagerContries_FinalUpdate
+// Package: utils
+// Mô tả: Mã nguồn Java (dạng text) — có comment giải thích phương thức.
+// ============================================================
+
+package utils;
+
+
+import java.util.Scanner;
+public class Validator {
+
+    private static final Scanner SCANNER = new Scanner(System.in);
+
+    /**
+     * Constructor: khởi tạo đối tượng Validator.
+     */
+    private Validator() {
+    }
+
+    /**
+     * Nhập số nguyên trong khoảng [min, max], lặp đến khi hợp lệ.
+     */
+    public static int getInt(
+            String messageInfo,
+            String messageErrorOutOfRange,
+            String messageErrorInvalidNumber,
+            int min, int max) {
+        do {
+            try {
+                System.out.println(messageInfo);
+                int number = Integer.parseInt(SCANNER.nextLine());
+                if (number >= min && number <= max) {
+                    return number;
+                }
+                System.out.println(messageErrorOutOfRange);
+            } catch (NumberFormatException e) {
+                System.out.println(messageErrorInvalidNumber);
+            }
+        } while (true);
+    }
+
+    /**
+     * Nhập số thực trong khoảng cho phép, lặp đến khi hợp lệ.
+     */
+    public static double getDouble(
+            String messageInfo,
+            String messageErrorOutOfRange,
+            String messageErrorInvalidNumber,
+            double min, double max) {
+        do {
+            try {
+                System.out.print(messageInfo);
+                double number = Double.parseDouble(SCANNER.nextLine());
+                if (number >= min && number <= max) {
+                    return number;
+                }
+                System.out.println(messageErrorOutOfRange);
+            } catch (NumberFormatException e) {
+                System.out.println(messageErrorInvalidNumber);
+            }
+        } while (true);
+    }
+
+    /**
+     * Nhập chuỗi từ bàn phím, lặp đến khi khớp regex.
+     */
+    public static String getString(String messageInfo, String messageError,
+            final String REGEX) {
+        do {
+            System.out.print(messageInfo);
+            String str = SCANNER.nextLine();
+            if (str.matches(REGEX)) {
+                return str;
+            }
+            System.out.println(messageError);
+        } while (true);
+    }
+}

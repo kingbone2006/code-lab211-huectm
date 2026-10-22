@@ -1,0 +1,130 @@
+// ============================================================
+// File: Manager.class.txt
+// Project: J1.S.P0056_ManagerWorker
+// Package: bo
+// Mô tả: Mã nguồn Java (dạng text) — có comment giải thích phương thức.
+// ============================================================
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package bo;
+
+import entity.SalaryHistory;
+import entity.SalaryStatus;
+import entity.Worker;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+public class Manager {
+
+    private List<Worker> workers;
+    private List<SalaryHistory> histories;
+
+    /**
+     * Constructor: khởi tạo đối tượng Manager.
+     */
+    public Manager() {
+        histories = new ArrayList<>();
+        workers = new ArrayList<>();
+    }
+
+    /**
+     * Lấy thông tin công nhân theo mã.
+     */
+    private Worker getWorker(String id) {
+        for (Worker workers : workers) {
+            if (workers.getId().equalsIgnoreCase(id)) {
+                return workers;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Kiểm tra đã tồn tại hay chưa.
+     */
+    private boolean isExist(String id) {
+        return getWorker(id) != null;
+    }
+
+    /**
+     * Thêm công nhân mới vào hệ thống.
+     */
+    public void addWorker(Worker worker) throws Exception {
+        if (worker == null) {
+            throw new Exception("Worker can not be null");
+        }
+        if (isExist(worker.getId())) {
+            throw new Exception("Worker with ID " + worker.getId() + " already exists.");
+        }
+        if (workers.add(worker)) {
+            System.out.println("Add success: " + worker.toString());
+        }
+    }
+
+    /**
+     * Thay đổi lương công nhân (tăng/giảm) và ghi lịch sử.
+     */
+    public void changeSalary(SalaryStatus status, String code, double amount) throws Exception {
+        if (workers.isEmpty()) {
+            throw new Exception("List is empty! Can not change salary");
+        }
+        if (!isExist(code)) {
+            throw new Exception("Can not found code!");
+        }
+        if (amount <= 0) {
+            throw new Exception("Amount of money must be > 0 ");
+        }
+        Worker worker = getWorker(code);
+        switch (status) {
+            case UP:
+                worker.setSalary(worker.getSalary() + amount);
+                break;
+            case DOWN:
+                if (worker.getSalary() - amount < 0) {
+                    throw new Exception("Can not down " + amount);
+                }
+                worker.setSalary(worker.getSalary() - amount);
+                break;
+        }
+        histories.add(new SalaryHistory(worker.getId(), worker.getSalary(), status, new Date()));
+        System.out.println("Update Salary Successful!");
+    }
+
+    /**
+     * Hiển thị thông tin ra màn hình (displaySalaryChangeHistory).
+     */
+    public void displaySalaryChangeHistory() throws Exception {
+        if (histories.isEmpty()) {
+            throw new Exception("History Salary is empty!!");
+        }
+        Collections.sort(histories);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String str = String.format("%7s%10s%10s%10s%10s%15s\n", "Code", "Name", "Age", "Salary", "Status", "Date");
+        for (int i = 0; i < histories.size(); i++) {
+            String workerID = histories.get(i).getWorkerID();
+            str += String.format("%7s%10s%10d%10.0f%10s%15s\n", workerID, getWorker(workerID).getName(),
+                    getWorker(workerID).getAge(), histories.get(i).getSalaryUpdate(),
+                    histories.get(i).getStatus(), dateFormat.format(histories.get(i).getDate()));
+        }
+        System.out.println(str);
+    }
+
+    //Yeu cau them hien thi danh sach worker
+    public void displayWorkerList() throws Exception {
+        if (workers.isEmpty()) {
+            throw new Exception("List Worker is empty!");
+        }
+        String str = String.format("%7s%10s%10s%10s%15s\n", "Code", "Name", "Age", "Salary", "Work Location");
+        for (int i = 0; i < workers.size(); i++) {
+            str += workers.get(i);
+        }
+        System.out.println(str);
+    }
+}

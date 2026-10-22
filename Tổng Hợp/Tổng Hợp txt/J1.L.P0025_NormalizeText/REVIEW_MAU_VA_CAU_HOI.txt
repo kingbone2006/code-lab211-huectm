@@ -1,0 +1,109 @@
+================================================================================
+  REVIEW BÀI: J1.L.P0025 — Normalize Text
+  Thư mục txt: Tổng Hợp txt / J1.L.P0025_NormalizeText
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+A. GIỚI THIỆU NHANH (30–45 giây)
+────────────────────────────────────────────────────────────────────────────────
+
+"Bài em chuẩn hóa văn bản từ file input.txt sang output.txt.
+Package model chứa TextNormalizer (đọc từng ký tự, áp rule, ghi ra).
+Package ui.Main chỉ gọi normalizer.run.
+Em không nạp cả file thành 1 String lớn mà xử lý theo stream từng ký tự."
+
+
+────────────────────────────────────────────────────────────────────────────────
+B. CẤU TRÚC
+────────────────────────────────────────────────────────────────────────────────
+
+model/TextNormalizer.class.txt  — nghiệp vụ chuẩn hóa
+ui/Main.class.txt               — điểm vào
+
+Trạng thái trong TextNormalizer:
+  capitalizeNext  — chữ cái kế tiếp có viết hoa không
+  inQuotes        — đang nằm trong dấu ngoặc kép
+  hasWritten      — đã ghi gì ra output chưa
+  lastWritten     — ký tự vừa ghi
+
+
+────────────────────────────────────────────────────────────────────────────────
+C. LUỒNG XỬ LÝ
+────────────────────────────────────────────────────────────────────────────────
+
+Main → TextNormalizer.run(input, output)
+  1. printFile(input)     // in trước chuẩn hóa
+  2. normalize(input, output)
+       - mở BufferedReader / BufferedWriter
+       - đọc từng char → processChar
+       - cuối file: đảm bảo kết thúc bằng dấu chấm
+  3. printFile(output)    // in sau chuẩn hóa
+
+
+────────────────────────────────────────────────────────────────────────────────
+D. RULE CHUẨN HÓA (hay bị hỏi)
+────────────────────────────────────────────────────────────────────────────────
+
+1. Gộp nhiều space / tab / xuống dòng → tối đa 1 space
+2. Dấu , . : không có space trước; có 1 space sau
+3. Sau dấu chấm → chữ cái tiếp theo viết HOA
+4. Chữ thường các vị trí khác (trừ quy tắc hoa)
+5. Ngoặc kép: không space sát ngay trong/ngoài theo rule processChar
+6. Kết thúc văn bản bằng dấu chấm
+
+
+────────────────────────────────────────────────────────────────────────────────
+E. METHOD CHÍNH — CHỈ ĐOẠN CODE
+────────────────────────────────────────────────────────────────────────────────
+
+run()          — điều phối: in trước → normalize → in sau
+normalize()    — đọc/ghi file, reset state, vòng while read()
+printFile()    — in nội dung file ra console
+processChar()  — ★ rule chuẩn hóa từng ký tự
+flushSpace()   — ghi space đang chờ nếu hợp lệ
+write()        — ghi 1 char + cập nhật lastWritten, hasWritten
+
+
+────────────────────────────────────────────────────────────────────────────────
+F. CÂU HỎI + ĐÁP ÁN
+────────────────────────────────────────────────────────────────────────────────
+
+Q1. Vì sao đọc từng ký tự, không đọc cả file?
+A: Tiết kiệm bộ nhớ, xử lý stream; yêu cầu bài/ghi chú code: không nạp cả
+   file thành String.
+
+Q2. processChar xử lý space thế nào?
+A: Gặp space/tab/\n... thì chỉ đánh dấu pendingSpace (1 space), không ghi ngay.
+   Khi gặp ký tự thật mới flushSpace nếu hợp lệ.
+
+Q3. capitalizeNext dùng khi nào?
+A: true sau dấu chấm (hoặc đầu văn bản). Chữ cái kế → toUpperCase, rồi gán false.
+
+Q4. Cuối normalize vì sao ghi thêm '.' ?
+A: Rule bắt buộc kết thúc bằng dấu chấm nếu chưa có.
+
+Q5. FileNotFoundException xử lý ra sao?
+A: Bọc thành IOException với message rõ, Main catch Exception in lỗi.
+
+Q6. Main làm gì?
+A: new TextNormalizer().run("input.txt","output.txt");
+
+Q7. StringBuffer pendingSpace size 1 để làm gì?
+A: Chỉ cần nhớ "đang chờ 1 space" — không lưu cả đoạn văn.
+
+Q8. Phân biệt flushSpace và write?
+A: write ghi 1 char thật; flushSpace chỉ ghi space pending khi điều kiện cho phép
+   (đã có nội dung, không space kép, không space ngay sau ngoặc mở...).
+
+
+────────────────────────────────────────────────────────────────────────────────
+G. CHECKLIST DEMO
+────────────────────────────────────────────────────────────────────────────────
+
+[ ] Có input.txt mẫu với space thừa, dấu câu
+[ ] Chạy ra output.txt đã chuẩn hóa
+[ ] Chỉ được processChar / normalize khi hỏi rule
+[ ] Nói được 4 biến trạng thái
+
+
+================================================================================

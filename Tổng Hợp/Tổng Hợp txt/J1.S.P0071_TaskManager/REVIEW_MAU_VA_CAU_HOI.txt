@@ -1,0 +1,111 @@
+================================================================================
+  REVIEW BÀI: J1.S.P0071 — Task Manager
+  Thư mục txt: Tổng Hợp txt / J1.S.P0071_TaskManager
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+A. GIỚI THIỆU NHANH
+────────────────────────────────────────────────────────────────────────────────
+
+"Bài quản lý task: thêm, xóa, hiển thị.
+entity.Task: id, TaskType, requirementName, date, planFrom, planTo, assign, reviewer.
+entity.TaskType: loại task (Code, Test, Design, Review...).
+controller.ManagerTask: add, delete, display, check trùng.
+ui.Main: menu. utils.Validator: nhập số/chuỗi/date."
+
+
+────────────────────────────────────────────────────────────────────────────────
+B. CẤU TRÚC
+────────────────────────────────────────────────────────────────────────────────
+
+controller/ManagerTask.class.txt
+entity/Task.class.txt
+entity/TaskType.class.txt
+utils/Validator.class.txt
+ui/Main.class.txt
+
+
+────────────────────────────────────────────────────────────────────────────────
+C. LUỒNG CHỨC NĂNG
+────────────────────────────────────────────────────────────────────────────────
+
+Menu điển hình:
+  1. Add Task
+  2. Delete Task
+  3. Display Task
+  4. Exit
+
+Add:
+  Task.input() → ManagerTask.add(task)
+    - check isExisted (trùng thông tin?) 
+    - gán id tự tăng
+    - add vào list → return id
+
+Delete:
+  nhập ID → getIndexByID → remove; không thấy → throw
+
+Display:
+  list rỗng → throw; else in bảng task
+
+
+────────────────────────────────────────────────────────────────────────────────
+D. METHOD — CHỈ CHỖ
+────────────────────────────────────────────────────────────────────────────────
+
+ManagerTask:
+  isExisted(task)     — private, so trùng task
+  add(task)           — validate + id + add, return id
+  getIndexByID(id)    — tìm vị trí
+  delete(ID)          — xóa theo id
+  display()           — in danh sách
+  getList()           — trả list
+
+Task:
+  setPlanFrom / setPlanTo — giờ kế hoạch (bước 0.5 giờ nếu có isHalfHourIncrement)
+  input()             — nhập đủ field có validate
+  toString()          — format 1 dòng task
+
+
+────────────────────────────────────────────────────────────────────────────────
+E. CÂU HỎI + ĐÁP ÁN
+────────────────────────────────────────────────────────────────────────────────
+
+Q1. ID task gán thế nào?
+A: Tự tăng khi add (id = list.size()+1 hoặc lastId+1) — xem code add().
+
+Q2. planFrom / planTo rule?
+A: Trong khoảng giờ làm việc (vd 8.0–17.5), planTo > planFrom,
+   bước 0.5 giờ (8, 8.5, 9...) nếu có isHalfHourIncrement.
+
+Q3. isExisted check gì?
+A: Thường so requirement, date, plan, assign... (chỉ đúng điều kiện trong code)
+   — tránh task trùng hoàn toàn.
+
+Q4. delete không tìm thấy ID?
+A: getIndexByID = -1 → throw Exception.
+
+Q5. TaskType dùng enum hay class?
+A: Xem entity/TaskType — thường enum hoặc class map id→name
+   (1-Code, 2-Test, 3-Design, 4-Review).
+
+Q6. Vì sao tách controller và entity?
+A: entity = dữ liệu; controller = nghiệp vụ list. Main chỉ UI.
+
+Q7. Date nhập format nào?
+A: Validator.getDate với SimpleDateFormat (vd dd-MM-yyyy) — lenient false.
+
+Q8. display list rỗng?
+A: throw "List empty" — Main in message.
+
+
+────────────────────────────────────────────────────────────────────────────────
+F. CHECKLIST
+────────────────────────────────────────────────────────────────────────────────
+
+[ ] Add 2 task → display
+[ ] Delete id tồn tại → mất khỏi list
+[ ] Delete id sai → lỗi
+[ ] planTo <= planFrom → không cho (nếu code validate)
+
+
+================================================================================

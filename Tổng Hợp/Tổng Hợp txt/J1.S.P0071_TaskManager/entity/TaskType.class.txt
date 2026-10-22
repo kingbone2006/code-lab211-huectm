@@ -1,0 +1,61 @@
+// ============================================================
+// File: TaskType.class.txt
+// Project: J1.S.P0071_TaskManager
+// Package: entity
+// Mô tả: Mã nguồn Java (dạng text) — có comment giải thích phương thức.
+// ============================================================
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package entity;
+
+public enum TaskType {
+    CODE(1, "Code"),
+    TEST(2, "Test"),
+    DESIGN(3, "Design"),
+    REVIEW(4, "Review");
+
+    private int id;
+    private String name;
+
+    // Constructor for the enum
+    private TaskType(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    /**
+     * Getter: trả về giá trị thuộc tính TaskTypeByID.
+     */
+    public static TaskType getTaskTypeByID(int ID) {
+        switch (ID) {
+            case 1:
+                return CODE;
+            case 2:
+                return TEST;
+            case 3:
+                return DESIGN;
+            case 4:
+                return REVIEW;
+            default:
+                throw new AssertionError();
+        }
+    }
+
+    /**
+     * Lấy ID.
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * Lấy tên.
+     */
+    public String getName() {
+        return name;
+    }
+}

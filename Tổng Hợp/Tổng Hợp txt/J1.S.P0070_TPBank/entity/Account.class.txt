@@ -1,0 +1,58 @@
+// ============================================================
+// File: Account.class.txt
+// Project: J1.S.P0070_TPBank
+// Package: entity
+// Mô tả: Mã nguồn Java (dạng text) — có comment giải thích phương thức.
+// ============================================================
+
+package entity;
+
+public class Account {
+    private String account;
+    private String password;
+
+    /**
+     * Constructor: khởi tạo đối tượng Account.
+     */
+    public Account(String account, String password) {
+        // Dùng luôn setter trong constructor để dữ liệu khởi tạo cũng phải chuẩn
+        setAccount(account);
+        setPassword(password);
+    }
+
+    /**
+     * Lấy thông tin tài khoản.
+     */
+    public String getAccount() {
+        return account;
+    }
+
+    /**
+     * Setter: gán giá trị cho thuộc tính Account.
+     */
+    public void setAccount(String account) {
+        // Kiểm tra ngoại lệ: Tài khoản phải là 10 chữ số
+        if (account == null || !account.matches("^[0-9]{10}$")) {
+            throw new IllegalArgumentException("Lỗi hệ thống: Số tài khoản phải bao gồm 10 chữ số!");
+        }
+        this.account = account;
+    }
+
+    /**
+     * Lấy mật khẩu.
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * Gán mật khẩu.
+     */
+    public void setPassword(String password) {
+        // Kiểm tra ngoại lệ: Mật khẩu 8-31 ký tự, gồm cả chữ và số
+        if (password == null || !password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,31}$")) {
+            throw new IllegalArgumentException("Lỗi hệ thống: Mật khẩu phải từ 8-31 ký tự và chứa cả chữ lẫn số!");
+        }
+        this.password = password;
+    }
+}

@@ -1,0 +1,199 @@
+// ============================================================
+// File: TextNormalizer.class.txt
+// Project: J1.L.P0025_NormalizeText
+// Package: model
+// Mô tả: Mã nguồn Java (dạng text) — có comment giải thích phương thức.
+// ============================================================
+
+package model;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+/**
+ * Chuẩn hóa văn bản: đọc file input, ghi file output từng ký tự.
+ * Không nạp cả file thành String.
+ */
+public class TextNormalizer {
+
+    private boolean capitalizeNext = true; // viết hoa chữ cái tiếp theo
+    private boolean inQuotes = false;      // đang trong ngoặc kép
+    private boolean hasWritten = false;    // đã ghi ký tự ra output chưa
+    private char lastWritten = 0;          // ký tự vừa ghi
+
+    /** In file gốc, chuẩn hóa, in kết quả. */
+    public void run(String inputPath, String outputPath) throws IOException {
+        System.out.println("===== Before normalize =====");
+        printFile(inputPath);
+
+        normalize(inputPath, outputPath);
+
+        System.out.println();
+        System.out.println("===== After normalize =====");
+        printFile(outputPath);
+        System.out.println();
+        System.out.println("Normalized text written to " + outputPath);
+    }
+
+    /** Chuẩn hóa từ file input sang file output. */
+    public void normalize(String inputPath, String outputPath) throws IOException {
+        if (inputPath == null || inputPath.trim().isEmpty()
+                || outputPath == null || outputPath.trim().isEmpty()) {
+            throw new IllegalArgumentException("File path cannot be empty");
+        }
+
+        // Reset trạng thái
+        capitalizeNext = true;
+        inQuotes = false;
+        hasWritten = false;
+        lastWritten = 0;
+
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
+        try {
+            reader = new BufferedReader(new FileReader(inputPath));
+            writer = new BufferedWriter(new FileWriter(outputPath));
+
+            // Chỉ giữ tối đa 1 space đang chờ (không lưu cả văn bản)
+            StringBuffer pendingSpace = new StringBuffer(1);
+            int code;
+            while ((code = reader.read()) != -1) {
+                processChar((char) code, writer, pendingSpace);
+            }
+
+            pendingSpace.setLength(0);
+            // Bắt buộc kết thúc bằng dấu chấm
+            if (!hasWritten || lastWritten != '.') {
+                write(writer, '.');
+            }
+            writer.flush();
+        } catch (FileNotFoundException e) {
+            throw new IOException("File not found: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new IOException("Cannot read or write file: " + e.getMessage(), e);
+        } finally {
+            // Đóng file
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ignored) {
+                }
+            }
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+
+    /** In nội dung file ra màn hình. */
+    public void printFile(String path) throws IOException {
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(path));
+            int code;
+            while ((code = reader.read()) != -1) {
+                System.out.print((char) code);
+            }
+            System.out.println();
+        } catch (FileNotFoundException e) {
+            throw new IOException("File not found: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new IOException("Cannot read file: " + e.getMessage(), e);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+
+    /** Xử lý từng ký tự theo rule chuẩn hóa. */
+    private void processChar(char ch, BufferedWriter writer, StringBuffer pendingSpace)
+            throws IOException {
+
+        // Space / xuống dòng: gộp thành 1 space
+        if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f') {
+            if (hasWritten && pendingSpace.length() == 0) {
+                pendingSpace.append(' ');
+            }
+            return;
+        }
+
+        // Ngoặc kép: không space sát trong ngoặc
+        if (ch == '"' || ch == '\u201C' || ch == '\u201D') {
+            if (!inQuotes) {
+                flushSpace(writer, pendingSpace, true);
+                write(writer, '"');
+                inQuotes = true;
+                pendingSpace.setLength(0);
+            } else {
+                pendingSpace.setLength(0);
+                write(writer, '"');
+                inQuotes = false;
+            }
+            return;
+        }
+
+        // Dấu , . : không space trước, 1 space sau; sau . thì viết hoa
+        if (ch == ',' || ch == '.' || ch == ':') {
+            pendingSpace.setLength(0);
+            write(writer, ch);
+            if (ch == '.') {
+                capitalizeNext = true;
+            }
+            pendingSpace.setLength(0);
+            pendingSpace.append(' ');
+            return;
+        }
+
+        // Chữ / ký tự khác
+        flushSpace(writer, pendingSpace, true);
+        if (Character.isLetter(ch)) {
+            if (capitalizeNext) {
+                ch = Character.toUpperCase(ch);
+                capitalizeNext = false;
+            } else {
+                ch = Character.toLowerCase(ch);
+            }
+        } else {
+            capitalizeNext = false;
+        }
+        write(writer, ch);
+    }
+
+    /** Ghi space đang chờ nếu hợp lệ. */
+    private void flushSpace(BufferedWriter writer, StringBuffer pendingSpace, boolean allow)
+            throws IOException {
+        if (pendingSpace.length() == 0 || !allow || !hasWritten) {
+            pendingSpace.setLength(0);
+            return;
+        }
+        // Không space ngay sau ngoặc mở
+        if (lastWritten == '"' && inQuotes) {
+            pendingSpace.setLength(0);
+            return;
+        }
+        if (lastWritten == ' ') {
+            pendingSpace.setLength(0);
+            return;
+        }
+        write(writer, ' ');
+        pendingSpace.setLength(0);
+    }
+
+    /** Ghi 1 ký tự ra file. */
+    private void write(BufferedWriter writer, char ch) throws IOException {
+        writer.write(ch);
+        lastWritten = ch;
+        hasWritten = true;
+    }
+}

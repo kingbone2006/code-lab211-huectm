@@ -1,0 +1,111 @@
+================================================================================
+  REVIEW BÀI: J1.S.P0070 — TPBank Ebank Login
+  Thư mục txt: Tổng Hợp txt / J1.S.P0070_TPBank
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+A. GIỚI THIỆU NHANH
+────────────────────────────────────────────────────────────────────────────────
+
+"Bài mô phỏng đăng nhập Ebank: chọn ngôn ngữ VI/EN, nhập account, password,
+captcha. bo.Ebank xử lý validate + login. resources Language_*.properties i18n.
+utils.Validate nhập liệu; entity.Account; data.Data danh sách account mẫu."
+
+
+────────────────────────────────────────────────────────────────────────────────
+B. CẤU TRÚC
+────────────────────────────────────────────────────────────────────────────────
+
+bo/Ebank.class.txt
+data/Data.class.txt
+entity/Account.class.txt
+resources/Language_en.properties.txt
+resources/Language_vi.properties.txt
+utils/Constant.class.txt
+utils/Validate.class.txt
+ui/Main.class.txt
+
+
+────────────────────────────────────────────────────────────────────────────────
+C. LUỒNG LOGIN
+────────────────────────────────────────────────────────────────────────────────
+
+1. Menu chọn ngôn ngữ → Ebank.setLocate(Locale)
+2. Nhập account number → checkAccountNumber (regex 10 chữ số)
+3. Nhập password → checkPassword (8–31 ký tự, có chữ + số)
+4. generateCaptcha → hiện captcha
+5. Nhập captcha → checkCaptcha / verifyCaptcha
+6. login(account, password) đối chiếu data
+7. In message success/fail theo ngôn ngữ (ResourceBundle / properties)
+
+
+────────────────────────────────────────────────────────────────────────────────
+D. METHOD QUAN TRỌNG — CHỈ CHỖ
+────────────────────────────────────────────────────────────────────────────────
+
+setLocate(Locale)              — đổi ngôn ngữ
+getMessage(key)                — lấy chuỗi từ properties
+checkAccountNumber(String)     — return "" nếu OK, else message lỗi
+checkPassword(String)          — tương tự
+generateCaptcha()              — random chuỗi captcha
+checkCaptcha(input, generate)  — so khớp
+login(acc, pass)               — tìm trong data, đúng → true
+
+Validate.getInt / getString / verifyCaptcha — nhập console
+
+
+────────────────────────────────────────────────────────────────────────────────
+E. CÂU HỎI + ĐÁP ÁN
+────────────────────────────────────────────────────────────────────────────────
+
+Q1. i18n / properties dùng thế nào?
+A: File Language_vi.properties / Language_en.properties chứa key=value.
+   Đổi Locale → ResourceBundle lấy đúng file → getMessage(key) ra tiếng Việt/Anh.
+
+Q2. Account number rule?
+A: Thường 10 chữ số (regex \\d{10}). Sai → InvalidAccount message.
+
+Q3. Password rule?
+A: 8–31 ký tự, có chữ và số (regex). Không chỉ toàn chữ hoặc toàn số.
+
+Q4. Captcha sinh ra sao? Check thế nào?
+A: generateCaptcha random (chữ/số). User nhập phải equals captcha generate
+   (VerifyCaptcha lặp đến đúng hoặc checkCaptcha trả message).
+
+Q5. login so khớp data thế nào?
+A: Duyệt list Account trong Data; so accountNumber + password.
+
+Q6. Vì sao tách Ebank và Validate?
+A: Ebank = business (rule ngân hàng, captcha, login).
+   Validate = utility nhập console tái sử dụng.
+
+Q7. checkAccountNumber return String thay vì boolean?
+A: Return "" = hợp lệ; return message lỗi = không hợp lệ — tiện in theo ngôn ngữ.
+
+Q8. Constant class chứa gì?
+A: Hằng regex, length, key message... tránh magic string rải code.
+
+
+────────────────────────────────────────────────────────────────────────────────
+F. CHỈ ĐOẠN CODE HAY HỎI
+────────────────────────────────────────────────────────────────────────────────
+
+  Đổi ngôn ngữ                 | setLocate + properties
+  Regex account/password       | checkAccountNumber / checkPassword / Constant
+  Sinh captcha                 | generateCaptcha
+  Xác thực captcha             | checkCaptcha hoặc Validate.verifyCaptcha
+  Đăng nhập                    | login + Data
+  Message đa ngôn ngữ          | getMessage(key)
+
+
+────────────────────────────────────────────────────────────────────────────────
+G. CHECKLIST
+────────────────────────────────────────────────────────────────────────────────
+
+[ ] Chọn VI → message tiếng Việt
+[ ] Account sai format → lỗi
+[ ] Captcha sai → nhập lại / fail
+[ ] Login đúng account trong Data → success
+
+
+================================================================================

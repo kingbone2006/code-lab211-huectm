@@ -1,0 +1,44 @@
+// ============================================================
+// File: Validator.class.txt
+// Project: J1.S.P0061_ManagerShape_FinalFixed
+// Package: utils
+// Mô tả: Mã nguồn Java (dạng text) — có comment giải thích phương thức.
+// ============================================================
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package utils;
+import java.util.Scanner;
+
+public class Validator {
+    private static final Scanner SCANNER = new Scanner(System.in);
+    
+    /**
+     * Constructor: khởi tạo đối tượng Validator.
+     */
+    private Validator(){   
+    }
+    
+    /**
+     * Nhập số thực trong khoảng cho phép, lặp đến khi hợp lệ.
+     */
+    public static double getDouble(String messageInfo,String messsageErrorOutOfRange,
+            String messageErrorNumber,double min,double max){
+        do {            
+            try {
+                System.out.println(messageInfo);
+                double number = Double.parseDouble(SCANNER.nextLine());
+                if(number>=min&&number<=max){
+                    return number;
+                }else{
+                    System.out.println(messsageErrorOutOfRange);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println(messageErrorNumber);
+            }
+        } while (true);
+    }
+}

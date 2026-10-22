@@ -1,0 +1,22 @@
+# ============================================================
+# File: Language_vi.properties.txt
+# Project: J1.S.P0070_TPBank
+# Package: resources
+# Mô tả: File properties (i18n / cấu hình) — key=value.
+# Mỗi dòng: khóa thông báo = nội dung hiển thị theo ngôn ngữ.
+# ============================================================
+
+
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+
+account = So tai khoan: 
+password = Mat khau: 
+captcha = Captcha: 
+inputCaptcha = Nhap 1 ky tu captcha: 
+InvalidAccount = So tai khoan la 1 so va co 10 chu so!
+InvalidPassword = Mat khau phai trong khoang 8-31 ki tu va phai chua ki tu chu va so!
+InvalidCaptcha = Captcha sai!
+loginSuccess = Dang nhap thanh cong!
+loginFailed = Dang nhap that bai!

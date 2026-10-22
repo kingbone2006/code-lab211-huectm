@@ -1,0 +1,24 @@
+// ============================================================
+// File: Main.class.txt
+// Project: J1.S.P0008_CounterWord
+// Package: ui
+// Mô tả: Mã nguồn Java (dạng text) — có comment giải thích phương thức.
+// ============================================================
+
+package ui;
+
+import model.ContentProcessor;
+
+public class Main {
+
+    /**
+     * Điểm vào chương trình: khởi tạo đối tượng và chạy luồng chính (menu / xử lý).
+     */
+    public static void main(String args[]) throws Exception {
+        // Khởi tạo đối tượng (Lúc này màn hình sẽ hiện câu hỏi nhập content)
+        ContentProcessor process = new ContentProcessor();
+        // In ra kết quả đếm
+        System.out.println(process.wordCount());
+        System.out.println(process.charCount());
+    }
+}

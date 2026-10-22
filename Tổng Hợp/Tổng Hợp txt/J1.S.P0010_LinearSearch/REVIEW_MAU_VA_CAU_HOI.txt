@@ -1,0 +1,274 @@
+================================================================================
+  REVIEW BÀI: J1.S.P0010 — Linear Search
+  Thư mục txt: Tổng Hợp txt / J1.S.P0010_LinearSearch
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+A. GIỚI THIỆU NHANH (30–45 giây)
+────────────────────────────────────────────────────────────────────────────────
+
+"Bài em làm tìm kiếm tuyến tính (Linear Search) trên mảng số nguyên.
+Người dùng nhập số phần tử n và giá trị cần tìm.
+Chương trình sinh mảng random, in mảng, rồi duyệt từ đầu đến cuối:
+gặp phần tử bằng value thì trả về index, hết mảng thì báo không tìm thấy.
+Code chính nằm ở MyArray.searchIndex."
+
+
+────────────────────────────────────────────────────────────────────────────────
+B. CẤU TRÚC
+────────────────────────────────────────────────────────────────────────────────
+
+array/MyArray.class.txt       — mảng + gen random + searchIndex (core)
+validator/Validator.class.txt — nhập int an toàn
+ui/Main.class.txt             — luồng: nhập size, value → search → in
+
+
+────────────────────────────────────────────────────────────────────────────────
+C. LINEAR SEARCH LÀ GÌ? (★ giải thích kỹ — thuộc khi review)
+────────────────────────────────────────────────────────────────────────────────
+
+### 1) Định nghĩa
+
+Linear Search (tìm kiếm tuyến tính / tìm kiếm tuần tự) là thuật toán tìm
+một phần tử trong danh sách/mảng bằng cách:
+
+  → Duyệt TỪNG PHẦN TỬ theo thứ tự, từ đầu → cuối (hoặc ngược lại)
+  → So sánh từng phần tử với giá trị cần tìm (key / value)
+  → Gặp phần tử TRÙNG → dừng, trả về vị trí (index)
+  → Duyệt HẾT mà không thấy → báo không tìm thấy (thường return -1)
+
+Gọi là "linear" / "tuyến tính" vì đi theo một đường thẳng qua các phần tử,
+không nhảy cóc, không chia đôi mảng.
+
+
+### 2) Ý tưởng trực quan
+
+  Mảng:   index:  0    1    2    3    4
+  value:         [7]  [2]  [9]  [2]  [5]
+                         ↑
+  Cần tìm value = 9
+
+  Bước 1: i=0, array[0]=7  ≠ 9  → tiếp
+  Bước 2: i=1, array[1]=2  ≠ 9  → tiếp
+  Bước 3: i=2, array[2]=9  == 9 → RETURN 2  (dừng)
+
+  Nếu tìm value = 4:
+  so 7, 2, 9, 2, 5 — không cái nào bằng 4 → RETURN -1
+
+
+### 3) Code trong bài — searchIndex (MyArray.java)
+
+    public int searchIndex(int value) {
+        for (int i = 0; i < array.length; i++) {   // duyệt i = 0 → n-1
+            if (array[i] == value) {               // so sánh từng phần tử
+                return i;                          // thấy → trả INDEX, dừng ngay
+            }
+        }
+        return -1;                                 // hết vòng → không thấy
+    }
+
+Giải thích từng dòng khi thầy hỏi:
+
+  | Thành phần              | Ý nghĩa                                      |
+  |-------------------------|----------------------------------------------|
+  | for i = 0 → length-1    | Xét lần lượt mọi phần tử (tuyến tính)        |
+  | array[i] == value       | Điều kiện "tìm thấy"                         |
+  | return i                | Trả về vị trí (0-based index)                |
+  | return -1               | Quy ước: không tồn tại trong mảng            |
+
+
+### 4) Đặc điểm quan trọng của Linear Search
+
+  (1) KHÔNG cần mảng đã sắp xếp (sorted)
+      — Binary search thì BẮT BUỘC sort trước; linear thì không.
+
+  (2) Đơn giản, dễ code — chỉ 1 vòng for + so sánh.
+
+  (3) Luôn đúng với mọi kiểu dữ liệu so sánh được (số, chuỗi...).
+
+  (4) Khi có NHIỀU phần tử trùng value:
+      Code bài này return phần tử ĐẦU TIÊN (index nhỏ nhất),
+      vì gặp là return ngay, không tìm tiếp.
+
+  (5) Index trong Java bắt đầu từ 0
+      Phần tử đầu = index 0, phần tử thứ k = index k-1.
+
+
+### 5) Độ phức tạp thời gian (Time Complexity)
+
+  Gọi n = số phần tử mảng (array.length)
+
+  | Trường hợp     | Khi nào                              | Số lần so sánh | Ký hiệu |
+  |----------------|--------------------------------------|----------------|---------|
+  | Best case      | value đúng ở đầu mảng (i=0)          | 1              | O(1)    |
+  | Average case   | value ở khoảng giữa / phân bố đều    | ~ n/2          | O(n)    |
+  | Worst case     | value ở cuối, hoặc KHÔNG có trong mảng | n           | O(n)    |
+
+  → Nói gọn: Linear Search có độ phức tạp O(n)
+    (tăng tỉ lệ thuận với số phần tử).
+
+  Không gian phụ (Space): O(1) — chỉ dùng vài biến i, không cấp mảng phụ.
+
+
+### 6) So sánh Linear Search vs Binary Search (hay hỏi)
+
+  | Tiêu chí           | Linear Search              | Binary Search                |
+  |--------------------|----------------------------|------------------------------|
+  | Cách làm           | Duyệt từng phần tử         | Chia đôi khoảng tìm          |
+  | Cần mảng sort?     | Không                      | Có (tăng/giảm dần)           |
+  | Độ phức tạp        | O(n)                       | O(log n)                     |
+  | Code               | Rất đơn giản               | Phức tạp hơn một chút        |
+  | Mảng nhỏ / chưa sort | Rất phù hợp              | Phải sort trước → tốn thêm   |
+  | Mảng lớn đã sort   | Chậm hơn                   | Nhanh hơn nhiều              |
+
+  Bài này CHỈ yêu cầu Linear Search → không sort, không binary.
+
+
+### 7) Ưu / nhược điểm (nói thêm nếu thầy hỏi)
+
+  Ưu:
+  - Dễ hiểu, dễ cài đặt
+  - Không cần điều kiện sort
+  - Hoạt động trên list liên kết (linked list) cũng được (duyệt node)
+
+  Nhược:
+  - Chậm với mảng rất lớn (phải quét gần hết / hết)
+  - Không tận dụng được nếu dữ liệu đã có thứ tự
+
+
+### 8) Ví dụ chạy theo code bài
+
+  Giả sử sau genRandomArray, mảng in ra: [3, 0, 2, 1, 2]
+  User search value = 2
+
+    i=0: 3 == 2? Không
+    i=1: 0 == 2? Không
+    i=2: 2 == 2? Có → return 2
+
+  Main in: "Found 2 at index: 2"
+  (Có thêm số 2 ở index 4 nhưng không xét vì đã return sớm)
+
+  Nếu value = 9:
+    duyệt hết 3,0,2,1,2 → không khớp → return -1
+  Main in: "Can not found value!"
+
+
+────────────────────────────────────────────────────────────────────────────────
+D. LUỒNG CHƯƠNG TRÌNH (Main)
+────────────────────────────────────────────────────────────────────────────────
+
+  1. Nhập size mảng (n > 0)     — Validator.getInt
+  2. Nhập search value          — Validator.getInt
+  3. new MyArray(size)          — cấp phát int[n], n<=0 thì throw
+  4. genRandomArray()           — mỗi phần tử = rand.nextInt(array.length)
+                                  → random trong [0 .. n-1]
+  5. In mảng: toString()        — dạng [a, b, c, ...]
+  6. index = searchIndex(value)
+  7. index == -1 → "Can not found value!"
+     else        → "Found X at index: Y"
+
+
+────────────────────────────────────────────────────────────────────────────────
+E. METHOD KHÁC TRONG MyArray
+────────────────────────────────────────────────────────────────────────────────
+
+MyArray(int number)   — if number <= 0 throw; else array = new int[number]
+genRandomArray()      — for i: array[i] = rand.nextInt(array.length)
+toString()            — ghép chuỗi "[x, y, z]"
+getArray / setArray   — getter/setter (setArray không copy — reference)
+searchIndex(value)    — ★ Linear Search
+
+
+────────────────────────────────────────────────────────────────────────────────
+F. CÂU HỎI + ĐÁP ÁN
+────────────────────────────────────────────────────────────────────────────────
+
+Q1. Linear search là gì?
+A: Thuật toán tìm kiếm tuần tự: duyệt từ đầu mảng đến cuối, so sánh từng
+   phần tử với value. Thấy thì trả index; hết mảng trả -1.
+   Không cần mảng đã sắp xếp. Độ phức tạp O(n).
+
+Q2. Vì sao gọi là "linear" / "tuyến tính"?
+A: Vì đi theo một đường thẳng qua các phần tử, số bước tỉ lệ thuận (linear)
+   với số phần tử n trong worst case.
+
+Q3. Chỉ đoạn code linear search trong project?
+A: MyArray.searchIndex — vòng for + if (array[i]==value) return i; return -1;
+
+Q4. searchIndex trả về gì khi không thấy? Vì sao -1?
+A: -1. Index hợp lệ luôn >= 0 nên -1 dùng làm tín hiệu "không tồn tại".
+   Main check index == -1 để in "Can not found value!".
+
+Q5. Có nhiều phần tử bằng value thì trả index nào?
+A: Index ĐẦU TIÊN (nhỏ nhất), vì return ngay khi gặp lần đầu.
+
+Q6. Linear khác Binary search chỗ nào?
+A: Linear: không cần sort, O(n), duyệt từng phần tử.
+   Binary: cần sort, O(log n), mỗi bước loại một nửa khoảng.
+
+Q7. Best / worst / average case?
+A: Best O(1) — ở đầu. Worst O(n) — ở cuối hoặc không có. Average O(n).
+
+Q8. Vì sao bài không sort trước khi search?
+A: Linear search không yêu cầu sort; sort sẽ tốn thêm O(n log n) không cần thiết
+   cho đúng đề bài.
+
+Q9. Mảng random range bao nhiêu?
+A: genRandomArray: rand.nextInt(array.length) → mỗi phần tử thuộc [0, n-1].
+
+Q10. size = 0 hoặc âm?
+A: Validator min=1 khi nhập; constructor MyArray cũng throw nếu number <= 0.
+
+Q11. Độ phức tạp không gian?
+A: O(1) phụ — chỉ biến i, không cấp mảng phụ.
+
+Q12. Linear search có dùng được cho mảng chưa sort không?
+A: Có — đó là ưu điểm chính so với binary search.
+
+Q13. Nếu muốn tìm TẤT CẢ vị trí trùng value thì sửa sao?
+A: Không return ngay; add index vào list / in ra, duyệt hết mảng.
+   (Code hiện tại chỉ tìm first occurrence.)
+
+Q14. Validator private constructor để làm gì?
+A: Utility class, chỉ static getInt, không cho new Validator().
+
+
+────────────────────────────────────────────────────────────────────────────────
+G. CHỈ ĐOẠN CODE HAY HỎI
+────────────────────────────────────────────────────────────────────────────────
+
+  Hỏi                              | Chỗ chỉ
+  ---------------------------------|----------------------------------
+  Thuật toán Linear Search         | MyArray.searchIndex (for + if)
+  Không tìm thấy                   | return -1; Main if (index == -1)
+  Sinh mảng random                 | genRandomArray — nextInt(length)
+  Cấp phát mảng                    | constructor MyArray(number)
+  In mảng                          | toString()
+  Nhập size / value                | Main + Validator.getInt
+
+
+────────────────────────────────────────────────────────────────────────────────
+H. SCRIPT NÓI VỀ LINEAR SEARCH (~30 giây)
+────────────────────────────────────────────────────────────────────────────────
+
+"Linear Search là tìm kiếm tuyến tính: em duyệt mảng từ index 0 đến hết,
+mỗi phần tử so với value cần tìm. Bằng thì return index ngay; hết mảng
+mà không có thì return -1. Thuật toán không cần mảng sort, độ phức tạp O(n)
+— worst case phải xem tất cả phần tử. Trong code em viết ở searchIndex
+bằng một vòng for. Khác binary search là binary phải sort sẵn và chia đôi,
+nhanh hơn O(log n) nhưng bài này chỉ yêu cầu linear."
+
+
+────────────────────────────────────────────────────────────────────────────────
+I. CHECKLIST DEMO
+────────────────────────────────────────────────────────────────────────────────
+
+[ ] Nhập n=5, xem mảng random in ra
+[ ] Chọn 1 value CÓ trong mảng → Found ... at index: ...
+[ ] Chọn value KHÔNG có → Can not found value!
+[ ] Giải thích được: duyệt tuần tự, O(n), không cần sort, return -1
+[ ] Chỉ được searchIndex khi thầy hỏi "thuật toán ở đâu?"
+[ ] Nói được first match nếu trùng nhiều phần tử
+
+
+================================================================================

@@ -1,0 +1,94 @@
+// ============================================================
+// File: Ebank.class.txt
+// Project: J1.S.P0070_TPBank
+// Package: bo
+// Mô tả: Mã nguồn Java (dạng text) — có comment giải thích phương thức.
+// ============================================================
+
+package bo;
+
+import data.Data;
+import entity.Account;
+import java.util.Locale;
+import java.util.Random;
+import java.util.ResourceBundle;
+import utils.Constant; // Đảm bảo import Constant nếu dùng
+
+public class Ebank {
+
+    private ResourceBundle bundle;
+
+    /**
+     * Constructor: khởi tạo đối tượng Ebank.
+     */
+    public Ebank() {
+    }
+
+    /**
+     * Setter: gán giá trị cho thuộc tính Locate.
+     */
+    public void setLocate(Locale locale) {
+        bundle = ResourceBundle.getBundle("resource/Language", locale); // Đảm bảo đúng tên thư mục của bạn
+    }
+
+    // Hàm này rất quan trọng để Main.java có thể lấy ngôn ngữ
+    public String getMessage(String key) {
+        return bundle.getString(key);
+    }
+
+    /**
+     * Kiểm tra định dạng số tài khoản.
+     */
+    public String checkAccountNumber(String accountNumber) {
+        if (accountNumber.matches(Constant.ACCOUNT_NUMBER)) {
+            return null;
+        } else {
+            return bundle.getString("accountInvalid");
+        }
+    }
+
+    /**
+     * Kiểm tra định dạng mật khẩu.
+     */
+    public String checkPassword(String password) {
+        if (password.matches(Constant.PASSWORD)) {
+            return null;
+        } else {
+            return bundle.getString("passwordInvalid");
+        }
+    }
+
+    /**
+     * Sinh mã captcha ngẫu nhiên.
+     */
+    public String generateCaptcha() {
+        String character = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm123456789";
+        StringBuilder captcha = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < Constant.CAPTCHA_LENGTH; i++) {
+            captcha.append(character.charAt(random.nextInt(character.length())));
+        }
+        return captcha.toString();
+    }
+
+    /**
+     * Kiểm tra captcha người dùng nhập có khớp không.
+     */
+    public String checkCaptcha(String captchaInput, String captchaGenerate) {
+        if (captchaGenerate.contains(captchaInput)) {
+            return null;
+        } else {
+            return bundle.getString("captchaInvalid");
+        }
+    }
+
+    // Đã đổi tên thành login giống trong ảnh của bạn
+    public boolean login(String accountNumber, String password) {
+        for (Account a : Data.listAccount) {
+            if (accountNumber.equals(a.getAccount()) && password.equals(a.getPassword())) {
+                return true;
+            }
+        }
+        return false;
+    }
+}

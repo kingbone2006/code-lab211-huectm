@@ -1,0 +1,221 @@
+================================================================================
+  REVIEW BÀI: J1.S.P0061 — Manager Shape (OOP)
+  Thư mục txt: Tổng Hợp txt / J1.S.P0061_ManagerShape_FinalFixed
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+A. GIỚI THIỆU NHANH
+────────────────────────────────────────────────────────────────────────────────
+
+"Bài tính chu vi / diện tích các hình: Circle, Rectangle, Triangle.
+entity.Shape là interface (input abstract).
+Các class implements Shape: có getPerimeter, getArea, printResult, input.
+ui.Main: nhập 3 hình rồi in kết quả. utils.Validator nhập số."
+
+
+────────────────────────────────────────────────────────────────────────────────
+B. CẤU TRÚC & OOP
+────────────────────────────────────────────────────────────────────────────────
+
+entity/Shape.class.txt        — interface
+entity/Circle.class.txt
+entity/Rectangle.class.txt
+entity/Triangle.class.txt
+utils/Validator.class.txt
+ui/Main.class.txt
+
+OOP:
+  - Interface Shape → đa hình (polymorphism)
+  - Main: Shape shapes[] = { new Rectangle(), new Circle(), new Triangle() };
+    for → input() rồi for → printResult()  (gọi đúng class lúc runtime)
+  - Mỗi hình tự implement input + công thức riêng
+  - final class Circle / Triangle → không cho extends thêm
+
+
+────────────────────────────────────────────────────────────────────────────────
+C. CÔNG THỨC (thuộc)
+────────────────────────────────────────────────────────────────────────────────
+
+Circle:
+  perimeter = 2 * π * r
+  area      = π * r * r
+
+Rectangle:
+  perimeter = 2 * (width + length)
+  area      = width * length
+
+Triangle (3 cạnh a, b, c — Heron):
+  perimeter = a + b + c
+  p = perimeter / 2          // nửa chu vi = (a+b+c)/2
+  area = sqrt[ p(p-a)(p-b)(p-c) ]
+
+
+────────────────────────────────────────────────────────────────────────────────
+C2. ĐIỀU KIỆN TAM GIÁC (★ hay hỏi — thuộc kỹ)
+────────────────────────────────────────────────────────────────────────────────
+
+### 1) Mỗi cạnh phải > 0
+
+  sideA > 0, sideB > 0, sideC > 0
+
+  Trong code:
+  - setSideA/B/C: nếu <= 0 → throw "Side A must be >0" (tương tự B, C)
+  - input(): Validator.getDouble với min > 0 (Please enter number >0)
+
+### 2) Bất đẳng thức tam giác (điều kiện chính)
+
+  Tổng HAI cạnh bất kỳ phải LỚN HƠN cạnh còn lại:
+
+    a + b > c
+    a + c > b
+    b + c > a
+
+  Code — method private isValidTriangle:
+
+    private boolean isValidTriangle(double a, double b, double c) {
+        return (a + b > c) && (a + c > b) && (b + c > a);
+    }
+
+  Lưu ý: phải là  >  (strict), không phải >=
+  → 2 + 3 = 5 với cạnh 5 là KHÔNG hợp lệ (thẳng hàng, diện tích 0).
+
+### 3) Message khi sai
+
+  "Sum of two side must be more than side remaining! Try again"
+
+  Nghĩa: Tổng hai cạnh phải lớn hơn cạnh còn lại — thử lại.
+
+### 4) Chỗ nào trong code check?
+
+  | Chỗ                          | Việc làm                                      |
+  |------------------------------|-----------------------------------------------|
+  | isValidTriangle(a,b,c)       | Hàm private: 3 bất đẳng thức                  |
+  | Constructor Triangle(a,b,c)  | !isValid → throw Exception                    |
+  | input()                      | while(true): nhập 3 cạnh; đúng ĐK thì break;  |
+  |                              | sai thì in message, nhập lại                  |
+  | getPerimeter() / getArea()   | Check lại; sai → "Invalid Triangle!"          |
+
+  Đoạn input() (ý chính):
+
+    if (sideA + sideB > sideC
+        && sideA + sideC > sideB
+        && sideB + sideC > sideA) {
+        break;   // hợp lệ → thoát vòng nhập
+    } else {
+        System.out.println("Sum of two side must be more than side remaining! Try again");
+    }
+
+### 5) Ví dụ số (nói trước thầy)
+
+  | A, B, C   | Hợp lệ? | Lý do                              |
+  |-----------|---------|------------------------------------|
+  | 3, 4, 5   | Có      | 3+4>5, 3+5>4, 4+5>3 (vuông)      |
+  | 5, 5, 6   | Có      | tam giác cân hợp lệ                |
+  | 1, 2, 10  | Không   | 1+2 = 3 không > 10                 |
+  | 2, 3, 5   | Không   | 2+3 = 5 không > 5 (cần >)          |
+  | -1, 4, 5  | Không   | cạnh không > 0                     |
+  | 0, 4, 5   | Không   | cạnh không > 0                     |
+
+### 6) Vì sao cần bất đẳng thức?
+
+  Trong hình học: 3 đoạn thẳng tạo thành 1 tam giác khép kín
+  chỉ khi tổng 2 cạnh luôn dài hơn cạnh thứ ba.
+  Nếu không → không khép được hình / diện tích Heron có thể ra NaN/0.
+
+
+────────────────────────────────────────────────────────────────────────────────
+D. CÂU HỎI + ĐÁP ÁN
+────────────────────────────────────────────────────────────────────────────────
+
+Q1. Shape là abstract class hay interface? Khác nhau?
+A: Trong bài là interface. Interface: contract (method), class implements.
+   Abstract class: có thể có field + method đã code sẵn.
+
+Q2. Polymorphism thể hiện thế nào?
+A: Main khai báo Shape shapes[] = { new Rectangle(), new Circle(), new Triangle() };
+   Gọi shapes[i].input() / printResult() — runtime gọi đúng class con.
+
+Q3. Vì sao tách Circle/Rectangle/Triangle?
+A: Mỗi hình công thức & thuộc tính khác nhau; dễ thêm hình mới (implements Shape).
+
+Q4. radius / cạnh âm xử lý?
+A: setRadius / setSide: phải > 0, không thì throw.
+   input dùng Validator.getDouble bắt số > 0.
+
+Q5. getPerimeter / getArea có side-effect không?
+A: Không — chỉ tính từ field; printResult mới in ra màn hình.
+
+Q6. Math.PI dùng ở đâu?
+A: Circle.getPerimeter (2*π*r) và getArea (π*r*r).
+
+Q7. Điều kiện để 3 cạnh tạo thành tam giác là gì?
+A: (1) a,b,c > 0
+   (2) a+b>c && a+c>b && b+c>a
+   Code: isValidTriangle + check trong input().
+
+Q8. Triangle nhập 1, 2, 10 được không?
+A: Không. 1+2 = 3 không > 10 → vi phạm bất đẳng thức.
+   input() in "Sum of two side must be more than side remaining! Try again"
+   và bắt nhập lại (while true).
+
+Q9. 2, 3, 5 có phải tam giác không?
+A: Không. 2+3 = 5 không thỏa > 5. Ba điểm thẳng hàng, không tạo diện tích.
+
+Q10. isValidTriangle nằm method nào? public hay private?
+A: private boolean isValidTriangle(double a, double b, double c) trong Triangle.
+   Chỉ dùng nội bộ class (constructor, getArea, getPerimeter).
+
+Q11. getArea tam giác dùng công thức gì?
+A: Heron: p = chu vi/2; area = sqrt(p(p-a)(p-b)(p-c)).
+   Trước khi tính vẫn check isValidTriangle.
+
+Q12. final class Triangle / Circle nghĩa là gì?
+A: Không cho class khác extends thêm.
+
+Q13. Message lỗi tam giác tiếng Anh nghĩa là gì?
+A: "Sum of two side must be more than side remaining"
+   = Tổng hai cạnh phải lớn hơn cạnh còn lại.
+
+Q14. Nếu bỏ check bất đẳng thức thì sao?
+A: Vẫn "nhập" được 1,2,10 nhưng getArea Heron có thể sai / NaN
+   vì (p-c) âm. Code đã chặn ở input + getArea/getPerimeter.
+
+
+────────────────────────────────────────────────────────────────────────────────
+E. CHỈ ĐOẠN CODE
+────────────────────────────────────────────────────────────────────────────────
+
+  Contract chung              | Shape.java (interface)
+  Mảng đa hình                | Main: Shape shapes[] = {...}
+  Công thức tròn              | Circle.getPerimeter / getArea
+  Công thức CN                | Rectangle.getPerimeter / getArea
+  Bất đẳng thức tam giác      | Triangle.isValidTriangle  (a+b>c && ...)
+  Check khi nhập              | Triangle.input()  if (a+b>c && ...)
+  Check khi tính              | getPerimeter / getArea gọi isValidTriangle
+  Diện tích Heron             | getArea: p = getPerimeter()/2; Math.sqrt(...)
+  Cạnh > 0                    | setSideA/B/C
+
+
+────────────────────────────────────────────────────────────────────────────────
+F. CHECKLIST DEMO
+────────────────────────────────────────────────────────────────────────────────
+
+[ ] Demo rectangle, circle, triangle in perimeter + area
+[ ] Cố tình nhập tam giác 1, 2, 10 → bị chặn, in message, nhập lại
+[ ] Nhập 3, 4, 5 → OK, area = 6 (vuông)
+[ ] Nói được interface + polymorphism (mảng Shape)
+[ ] Thuộc 3 bộ công thức + 3 bất đẳng thức a+b>c, a+c>b, b+c>a
+[ ] Chỉ được isValidTriangle khi thầy hỏi điều kiện tam giác
+
+
+────────────────────────────────────────────────────────────────────────────────
+G. SCRIPT NÓI NHANH VỀ TAM GIÁC (15–20 giây)
+────────────────────────────────────────────────────────────────────────────────
+
+"Tam giác em check 2 lớp: mỗi cạnh phải > 0, và bất đẳng thức tam giác —
+tổng hai cạnh bất kỳ lớn hơn cạnh còn lại: a+b>c, a+c>b, b+c>a.
+Hàm isValidTriangle làm việc này. Khi input sai em bắt nhập lại;
+khi tính chu vi diện tích em check lại rồi mới dùng công thức Heron."
+
+
+================================================================================

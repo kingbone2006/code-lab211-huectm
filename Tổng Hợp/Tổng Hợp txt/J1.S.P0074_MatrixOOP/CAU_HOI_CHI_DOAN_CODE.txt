@@ -1,0 +1,408 @@
+================================================================================
+  CÂU HỎI DẠNG "CHỈ ĐOẠN CODE NÀO?" + ĐÁP ÁN
+  File: Matrix.java | Main.java | Validator.java
+  (Số dòng theo source hiện tại trong src/)
+================================================================================
+
+Cách dùng khi review:
+  - Thầy hỏi → chỉ đúng file + dòng + đọc to 1 câu giải thích
+  - Không cần thuộc thuộc lòng cả class, chỉ cần chỉ đúng chỗ + nói ý nghĩa
+
+
+################################################################################
+# 1. NHÂN MA TRẬN / TÍCH VÔ HƯỚNG (hay hỏi nhất)
+################################################################################
+
+────────────────────────────────────────────────────────────────────────────────
+Q1. "Tích vô hướng (dot product) nằm ở đoạn code nào?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN:
+  File: entity/Matrix.java
+  Method: multiply(Matrix other)
+  Dòng: 76–77 (vòng for k + phép nhân-cộng dồn)
+
+  for (int k = 0; k < this.getCols(); k++) {
+      result.data[i][j] += this.data[i][k] * other.data[k][j];
+  }
+
+GIẢI THÍCH NÓI:
+  "Với mỗi ô kết quả C[i][j], em duyệt k dọc theo hàng i của A và cột j của B.
+   Cộng dồn A[i][k] * B[k][j] — đó chính là tích vô hướng của hàng i và cột j."
+
+SƠ ĐỒ NHANH:
+  Hàng i của A:   A[i][0]  A[i][1]  ...  A[i][n-1]
+  Cột j của B:    B[0][j]
+                  B[1][j]
+                  ...
+                  B[n-1][j]
+  C[i][j] = A[i][0]*B[0][j] + A[i][1]*B[1][j] + ... + A[i][n-1]*B[n-1][j]
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q2. "Vì sao dùng += mà không dùng = ?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN:
+  Dòng 77: result.data[i][j] += this.data[i][k] * other.data[k][j];
+
+  Vì tích vô hướng là TỔNG nhiều tích con theo k.
+  - Lần k=0: cộng phần tử đầu
+  - Lần k=1: cộng tiếp phần tử thứ hai
+  - ...
+  setSize tạo mảng int mặc định = 0 → bắt đầu từ 0 rồi += là đúng.
+
+  Nếu viết = thì mỗi lần k sẽ GHI ĐÈ, chỉ còn tích của k cuối → SAI.
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q3. "Ba vòng for i, j, k mỗi vòng làm gì?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN — Matrix.java dòng 74–79:
+
+  for (int i = 0; i < this.getRows(); i++) {          // i = hàng của A = hàng của C
+      for (int j = 0; j < other.getCols(); j++) {     // j = cột của B = cột của C
+          for (int k = 0; k < this.getCols(); k++) {  // k = chiều chung (cols A = rows B)
+              result.data[i][j] += this.data[i][k] * other.data[k][j];
+          }
+      }
+  }
+
+BẢNG:
+
+  Biến | Chạy từ          | Ý nghĩa
+  -----|------------------|----------------------------------
+  i    | 0 → rowsA-1      | Chọn hàng kết quả / hàng A
+  j    | 0 → colsB-1      | Chọn cột kết quả / cột B
+  k    | 0 → colsA-1      | Duyệt để tính tích vô hướng
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q4. "Điều kiện được phép nhân nằm ở đâu? Báo lỗi gì?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN — Matrix.java dòng 69–70:
+
+  if (this.getCols() != other.getRows()) {
+      throw new Exception("Cols of matrix 1 must be equal rows of matrix 2");
+  }
+
+NÓI:
+  "Cột ma trận 1 (this) phải bằng hàng ma trận 2 (other).
+   Không thỏa thì ném Exception, Main catch và in message."
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q5. "Kích thước ma trận kết quả khi nhân được set ở đâu? Size bao nhiêu?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN — Matrix.java dòng 73:
+
+  result.setSize(this.getRows(), other.getCols());
+  //              m = hàng A      p = cột B
+  // Kết quả C là (m × p)
+
+VÍ DỤ: A 2×3, B 3×2 → setSize(2, 2)
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q6. "this và other trong multiply là ma trận nào?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN:
+  - this  = ma trận bên trái (matrix1)  → A
+  - other = ma trận bên phải (matrix2) → B
+  Gọi: matrix1.multiply(matrix2)  hoặc  Matrix.multiply(matrix1, matrix2)
+  (static dòng 96–98 chỉ ủy quyền: return matrix1.multiply(matrix2);)
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q7. "Chỉ giúp chỗ Main gọi nhân ma trận?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN — ui/Main.java dòng 56–71, cụ thể dòng 62:
+
+  result = Matrix.multiply(matrix1, matrix2);
+
+  Đây là bản STATIC → bên trong gọi matrix1.multiply(matrix2) (non-static).
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q8. "Cho số cụ thể, C[0][0] tính ở những lệnh nào?"
+────────────────────────────────────────────────────────────────────────────────
+Ví dụ:
+  A = [1 2 3]     B = [7  8]
+      [4 5 6]         [9 10]
+                      [11 12]
+
+Khi i=0, j=0, vòng k chạy:
+  k=0: result[0][0] += 1*7   → 7
+  k=1: result[0][0] += 2*9   → 7+18=25
+  k=2: result[0][0] += 3*11  → 25+33=58
+
+→ Đúng 1 dòng code 77, lặp 3 lần với i=0, j=0.
+
+
+################################################################################
+# 2. CỘNG / TRỪ MA TRẬN
+################################################################################
+
+────────────────────────────────────────────────────────────────────────────────
+Q9. "Cộng từng phần tử nằm ở dòng nào?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN — Matrix.java dòng 47–49:
+
+  for (int i = 0; i < this.getRows(); i++) {
+      for (int j = 0; j < this.getCols(); j++) {
+          result.data[i][j] = this.data[i][j] + other.data[i][j];
+      }
+  }
+
+KHÁC NHÂN:
+  - Chỉ 2 vòng for (i, j) — không có k
+  - Dùng = (một phép cộng đúng vị trí), không cần +=
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q10. "Trừ ma trận khác cộng chỗ nào trong code?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN:
+  Cùng cấu trúc; khác dấu tại dòng 62:
+
+  add:      result.data[i][j] = this.data[i][j] + other.data[i][j];  // dòng 49
+  subtract: result.data[i][j] = this.data[i][j] - other.data[i][j];  // dòng 62
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q11. "Check cùng kích thước khi cộng/trừ ở đâu?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN — dòng 41–42 (add) và 55–56 (subtract):
+
+  if (this.getRows() != other.getRows() || this.getCols() != other.getCols()) {
+      throw new Exception("Rows and cols two matrix must be same");
+  }
+
+NÓI:
+  "Phải cùng hàng VÀ cùng cột — khác nhân (chỉ cần colsA == rowsB)."
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q12. "Kết quả cộng/trừ size set ở đâu?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN — dòng 45 (add) / 59 (subtract):
+
+  result.setSize(this.getRows(), this.getCols());
+  // Giống hệt size của A (và B)
+
+
+################################################################################
+# 3. STATIC VS NON-STATIC — CHỈ ĐÚNG CHỖ
+################################################################################
+
+────────────────────────────────────────────────────────────────────────────────
+Q13. "Bản non-static của nhân ở đâu? Bản static ở đâu?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN:
+  Non-static: Matrix.java dòng 68–82
+    public Matrix multiply(Matrix other)
+
+  Static:     Matrix.java dòng 96–99
+    public static Matrix multiply(Matrix matrix1, Matrix matrix2) {
+        return matrix1.multiply(matrix2);   // gọi lại non-static
+    }
+
+────────────────────────────────────────────────────────────────────────────────
+Q14. "Vì sao viết cả hai bản?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN:
+  - Logic thật chỉ viết 1 lần (non-static).
+  - Static = facade cho Main gọi Matrix.multiply(m1,m2) gọn, không lặp code.
+  - DRY (Don't Repeat Yourself).
+
+
+################################################################################
+# 4. NHẬP LIỆU / SET SIZE / TOSTRING
+################################################################################
+
+────────────────────────────────────────────────────────────────────────────────
+Q15. "Ma trận được tạo (cấp phát mảng) ở đâu?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN — setSize, dòng 17–22:
+
+  public void setSize(int rows, int cols) {
+      ...
+      this.data = new int[rows][cols];  // mọi phần tử int = 0
+  }
+
+Gọi từ: input() dòng 120; add/subtract/multiply khi tạo result.
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q16. "Nhập từng phần tử từ bàn phím ở đoạn nào?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN — input(), dòng 122–127:
+
+  for (int i = 0; i < this.getRows(); i++) {
+      for (int j = 0; j < this.getCols(); j++) {
+          this.data[i][j] = Validator.getInt(
+              "Enter matrix " + numberOfMatrix + String.format(" [%d][%d]: ", i+1, j+1),
+              ...
+          );
+      }
+  }
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q17. "In ma trận ra màn hình format [số] ở đâu?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN — toString(), dòng 103–113:
+
+  str.append(String.format("[%d]", data[i][j]));
+
+Main gọi: System.out.print(matrix1.toString());
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q18. "getRows / getCols lấy size thế nào? data null thì sao?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN:
+  getRows (24–28): data == null → 0; else data.length
+  getCols (31–36): null hoặc length 0 → 0; else data[0].length
+
+  Giả định: ma trận hình chữ nhật (mọi hàng cùng số cột).
+
+
+################################################################################
+# 5. VALIDATOR & XỬ LÝ LỖI
+################################################################################
+
+────────────────────────────────────────────────────────────────────────────────
+Q19. "Validate số nguyên nằm class nào? Method nào?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN:
+  Class: utils.Validator
+  Method: getInt(messageInfo, messageErrorOutOfRange, messageErrorNumber, min, max)
+  Logic: parseInt trong try → check min..max → sai thì lặp do-while(true)
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q20. "Exception size sai được bắt ở đâu? In ra thế nào?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN — Main.java mỗi case, ví dụ nhân dòng 61–70:
+
+  try {
+      result = Matrix.multiply(matrix1, matrix2);
+      ...
+  } catch (Exception e) {
+      System.out.println(e.getMessage());  // in đúng chuỗi throw bên Matrix
+  }
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q21. "Constructor private của Validator để làm gì?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN — Validator.java dòng 7–9:
+
+  private Validator() { }
+
+  Không cho new Validator() — đây là utility class, chỉ dùng method static.
+
+
+################################################################################
+# 6. CÂU HỎI BẪY / SO SÁNH NHANH
+################################################################################
+
+────────────────────────────────────────────────────────────────────────────────
+Q22. "Em có viết hàm 'dotProduct' riêng không? Tích vô hướng ở đâu?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN:
+  Không có method tên dotProduct.
+  Tích vô hướng được làm TRỰC TIẾP trong vòng for k của multiply (dòng 76–77).
+  Mỗi C[i][j] = một lần tính dot product.
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q23. "Nhân ma trận có phải nhân từng cặp A[i][j] * B[i][j] không?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN:
+  KHÔNG. Đó là nhân từng phần tử (element-wise / Hadamard) — bài này KHÔNG làm vậy.
+  Code đúng là:
+    this.data[i][k] * other.data[k][j]   // k chạy, cộng dồn
+  không phải:
+    this.data[i][j] * other.data[i][j]   // SAI với định nghĩa nhân ma trận
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q24. "Chỉ chỗ khác nhau duy nhất về ĐIỀU KIỆN giữa add và multiply?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN:
+
+  add      (41): rows bằng NHAU && cols bằng NHAU
+  multiply (69): cols của this == rows của other
+
+  setSize result:
+  add      (45): (rowsA, colsA)
+  multiply (73): (rowsA, colsB)
+
+
+────────────────────────────────────────────────────────────────────────────────
+Q25. "i, j trong cộng và i, j, k trong nhân — k lấy bound từ đâu?"
+────────────────────────────────────────────────────────────────────────────────
+ĐÁP ÁN:
+  k < this.getCols()   // = cols A = rows B (đã check ở if)
+  Cũng có thể viết k < other.getRows() — cùng một số sau khi đã validate.
+
+
+################################################################################
+# 7. BẢNG TRA CỨU NHANH — "HỎI GÌ → CHỈ DÒNG NÀO"
+################################################################################
+
+  Hỏi gì                              | File          | Dòng (gần)
+  ------------------------------------|---------------|----------
+  Tích vô hướng / cộng dồn nhân       | Matrix.java   | 76–77
+  3 vòng for nhân                     | Matrix.java   | 74–79
+  Check colsA == rowsB                | Matrix.java   | 69–70
+  setSize kết quả nhân (m×p)          | Matrix.java   | 73
+  Cộng từng ô                         | Matrix.java   | 47–49
+  Trừ từng ô                          | Matrix.java   | 60–62
+  Check cùng size cộng/trừ            | Matrix.java   | 41–42, 55–56
+  Static gọi non-static nhân          | Matrix.java   | 96–98
+  Main gọi nhân                       | Main.java     | 62
+  catch in lỗi                        | Main.java     | 68–70
+  new int[rows][cols]                 | Matrix.java   | 21
+  Nhập từng ô                         | Matrix.java   | 122–127
+  In [số]                             | Matrix.java   | 108
+  getInt validate                     | Validator.java| 10–25
+
+
+################################################################################
+# 8. MẪU TRẢ LỜI KHI THẦY CHỈ VÀO MÀN HÌNH: "DÒNG NÀY LÀM GÌ?"
+################################################################################
+
+Nếu thầy trỏ:
+
+  result.data[i][j] += this.data[i][k] * other.data[k][j];
+
+Nói mẫu (~15 giây):
+  "Đây là bước tính tích vô hướng cho phần tử kết quả hàng i cột j.
+   this.data[i][k] là phần tử trên hàng i của ma trận 1,
+   other.data[k][j] là phần tử trên cột j của ma trận 2,
+   k chạy hết chiều chung; += để cộng tất cả các tích lại."
+
+
+Nếu thầy trỏ:
+
+  if (this.getCols() != other.getRows())
+
+Nói mẫu:
+  "Đây là điều kiện được phép nhân ma trận: số cột ma trận trái
+   phải bằng số hàng ma trận phải. Không bằng thì throw, không tính tiếp."
+
+
+Nếu thầy trỏ:
+
+  result.setSize(this.getRows(), other.getCols());
+
+Nói mẫu:
+  "Tạo ma trận kết quả kích thước hàng của A nhân cột của B,
+   đúng lý thuyết nhân ma trận (m×n)*(n×p) = (m×p)."
+
+
+================================================================================
+  Gợi ý ôn: mở Matrix.java, đánh dấu 4 chỗ: if nhân | setSize | 3 for | dòng +=
+  Xong phần nhân thì cộng/trừ chỉ là bản đơn giản hơn (2 for + dấu +/−).
+================================================================================

@@ -1,0 +1,45 @@
+// ============================================================
+// File: Validator.class.txt
+// Project: J1.S.P0010_LinearSearch
+// Package: validator
+// Mô tả: Mã nguồn Java (dạng text) — có comment giải thích phương thức.
+// ============================================================
+
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package validator;
+
+import java.util.Scanner;
+public class Validator {
+
+    private static final Scanner SCANNER = new Scanner(System.in);
+
+    /**
+     * Constructor: khởi tạo đối tượng Validator.
+     */
+    private Validator() {
+
+    }
+
+    /**
+     * Nhập số nguyên trong khoảng [min, max], lặp đến khi hợp lệ.
+     */
+    public static int getInt(String messageInfo, String messsageErrorOutOfRange,
+            String messageErrorNumber, int min, int max) {
+        do {
+            try {
+                System.out.print(messageInfo);
+                int number = Integer.parseInt(SCANNER.nextLine());
+                if (number >= min && number <= max) {
+                    return number;
+                } else {
+                    System.out.println(messsageErrorOutOfRange);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println(messageErrorNumber);
+            }
+        } while (true);
+    }
+}

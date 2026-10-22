@@ -1,0 +1,110 @@
+================================================================================
+  REVIEW BÀI: J1.S.P0052 — Manager East Asia Countries
+  Thư mục txt: Tổng Hợp txt / J1.S.P0052_ManagerContries_FinalUpdate
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+A. GIỚI THIỆU NHANH
+────────────────────────────────────────────────────────────────────────────────
+
+"Bài quản lý thông tin quốc gia Đông Á.
+model.Country: code, name, totalArea.
+model.EastAsiaCountries extends Country: thêm countryTerrain.
+management.ManageEastAsiaCountries extends ArrayList<Country>:
+  thêm, lấy gần nhất, tìm theo tên, sort theo tên, display.
+main.Main: menu chức năng."
+
+
+────────────────────────────────────────────────────────────────────────────────
+B. CẤU TRÚC & OOP
+────────────────────────────────────────────────────────────────────────────────
+
+model/Country.class.txt
+model/EastAsiaCountries.class.txt     — kế thừa Country
+management/ManageEastAsiaCountries.class.txt  — extends ArrayList<Country>
+utils/Validator.class.txt
+main/Main.class.txt
+
+OOP nổi bật:
+  - Inheritance: EastAsiaCountries extends Country
+  - Override display() / input() ở class con
+  - ManageEastAsiaCountries IS-A ArrayList → có sẵn add, size, get...
+
+
+────────────────────────────────────────────────────────────────────────────────
+C. CHỨC NĂNG MENU (điển hình)
+────────────────────────────────────────────────────────────────────────────────
+
+1. Enter information of countries
+2. Display recently entered information
+3. Search by name
+4. Sort by name ascending + display
+5. Exit
+
+
+────────────────────────────────────────────────────────────────────────────────
+D. METHOD QUẢN LÝ — Ý NGHĨA
+────────────────────────────────────────────────────────────────────────────────
+
+addCountryInfor(Country)           — thêm vào list (có check trùng/null tùy code)
+getRecentlyEnteredInformation()    — phần tử cuối list (mới nhập)
+displayCountry / displayListCountries — in 1 hoặc cả list
+searchCountriesByName(String)      — lọc tên chứa keyword → list kết quả
+sortByNameCountry()                — sort tăng dần theo tên (Comparator/Comparable)
+
+
+────────────────────────────────────────────────────────────────────────────────
+E. CÂU HỎI + ĐÁP ÁN
+────────────────────────────────────────────────────────────────────────────────
+
+Q1. Vì sao EastAsiaCountries extends Country?
+A: Quốc gia ĐNA có thêm địa hình (terrain); tái sử dụng code, name, area từ cha.
+   Quan hệ "là một" (is-a).
+
+Q2. ManageEastAsiaCountries extends ArrayList — lợi / hại?
+A: Lợi: dùng sẵn add, get, size. Hại: lộ API ArrayList (vi phạm encapsulation
+   hơn composition). Có thể cải thiện: private List bên trong.
+
+Q3. getRecentlyEnteredInformation lấy phần tử nào?
+A: Thường là get(size()-1) — phần tử vừa add gần nhất.
+
+Q4. search theo name exact hay contains?
+A: Xem code searchCountriesByName — thường contains / equalsIgnoreCase.
+   (Chỉ đúng dòng so sánh trong file.)
+
+Q5. Sort dùng gì?
+A: Comparator theo getCountryName() hoặc Collections.sort.
+
+Q6. totalArea validate thế nào?
+A: > 0 (Validator getDouble), không âm.
+
+Q7. display() ở cha và con khác gì?
+A: Con gọi super / in thêm terrain.
+
+Q8. Vì sao dùng Exception khi list rỗng?
+A: Không có dữ liệu để hiển thị/tìm — báo user, Main catch in message.
+
+
+────────────────────────────────────────────────────────────────────────────────
+F. CHỈ ĐOẠN CODE HAY HỎI
+────────────────────────────────────────────────────────────────────────────────
+
+  Kế thừa Country                  | EastAsiaCountries extends Country
+  Thêm quốc gia                    | addCountryInfor
+  Mới nhập                         | getRecentlyEnteredInformation
+  Tìm tên                          | searchCountriesByName
+  Sort                             | sortByNameCountry
+  Override display                 | EastAsiaCountries.display
+
+
+────────────────────────────────────────────────────────────────────────────────
+G. CHECKLIST
+────────────────────────────────────────────────────────────────────────────────
+
+[ ] Add 2–3 country → display recently
+[ ] Search name một phần
+[ ] Sort A→Z
+[ ] Nói được inheritance Country → EastAsiaCountries
+
+
+================================================================================

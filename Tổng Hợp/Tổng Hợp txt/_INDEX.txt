@@ -1,0 +1,64 @@
+TỔNG HỢP TXT — Danh mục file
+==================================================
+Cấu trúc: <Tên bài>/<package>/ClassName.class.txt
+           <Tên bài>/<package>/file.properties.txt
+           <Tên bài>/REVIEW_MAU_VA_CAU_HOI.txt   ← ôn review + câu hỏi
+Mỗi file .class.txt = mã nguồn Java + comment giải thích phương thức.
+
+---------- MÃ NGUỒN (.class.txt / .properties.txt) ----------
+J1.L.P0025_NormalizeText/model/TextNormalizer.class.txt
+J1.L.P0025_NormalizeText/ui/Main.class.txt
+J1.S.P0008_CounterWord/model/ContentProcessor.class.txt
+J1.S.P0008_CounterWord/ui/Main.class.txt
+J1.S.P0008_CounterWord/validate/Validator.class.txt
+J1.S.P0010_LinearSearch/array/MyArray.class.txt
+J1.S.P0010_LinearSearch/ui/Main.class.txt
+J1.S.P0010_LinearSearch/validator/Validator.class.txt
+J1.S.P0052_ManagerContries_FinalUpdate/main/Main.class.txt
+J1.S.P0052_ManagerContries_FinalUpdate/management/ManageEastAsiaCountries.class.txt
+J1.S.P0052_ManagerContries_FinalUpdate/model/Country.class.txt
+J1.S.P0052_ManagerContries_FinalUpdate/model/EastAsiaCountries.class.txt
+J1.S.P0052_ManagerContries_FinalUpdate/utils/Validator.class.txt
+J1.S.P0056_ManagerWorker/bo/Manager.class.txt
+J1.S.P0056_ManagerWorker/entity/SalaryHistory.class.txt
+J1.S.P0056_ManagerWorker/entity/SalaryStatus.class.txt
+J1.S.P0056_ManagerWorker/entity/Worker.class.txt
+J1.S.P0056_ManagerWorker/ui/Main.class.txt
+J1.S.P0056_ManagerWorker/utils/Validator.class.txt
+J1.S.P0061_ManagerShape_FinalFixed/entity/Circle.class.txt
+J1.S.P0061_ManagerShape_FinalFixed/entity/Rectangle.class.txt
+J1.S.P0061_ManagerShape_FinalFixed/entity/Shape.class.txt
+J1.S.P0061_ManagerShape_FinalFixed/entity/Triangle.class.txt
+J1.S.P0061_ManagerShape_FinalFixed/ui/Main.class.txt
+J1.S.P0061_ManagerShape_FinalFixed/utils/Validator.class.txt
+J1.S.P0070_TPBank/bo/Ebank.class.txt
+J1.S.P0070_TPBank/data/Data.class.txt
+J1.S.P0070_TPBank/entity/Account.class.txt
+J1.S.P0070_TPBank/resources/Language_en.properties.txt
+J1.S.P0070_TPBank/resources/Language_vi.properties.txt
+J1.S.P0070_TPBank/ui/Main.class.txt
+J1.S.P0070_TPBank/utils/Constant.class.txt
+J1.S.P0070_TPBank/utils/Validate.class.txt
+J1.S.P0071_TaskManager/controller/ManagerTask.class.txt
+J1.S.P0071_TaskManager/entity/Task.class.txt
+J1.S.P0071_TaskManager/entity/TaskType.class.txt
+J1.S.P0071_TaskManager/ui/Main.class.txt
+J1.S.P0071_TaskManager/utils/Validator.class.txt
+J1.S.P0074_MatrixOOP/entity/Matrix.class.txt
+J1.S.P0074_MatrixOOP/ui/Main.class.txt
+J1.S.P0074_MatrixOOP/utils/Validator.class.txt
+
+---------- REVIEW / CÂU HỎI (mỗi bài) ----------
+J1.L.P0025_NormalizeText/REVIEW_MAU_VA_CAU_HOI.txt
+J1.S.P0008_CounterWord/REVIEW_MAU_VA_CAU_HOI.txt
+J1.S.P0010_LinearSearch/REVIEW_MAU_VA_CAU_HOI.txt
+J1.S.P0052_ManagerContries_FinalUpdate/REVIEW_MAU_VA_CAU_HOI.txt
+J1.S.P0056_ManagerWorker/REVIEW_MAU_VA_CAU_HOI.txt
+J1.S.P0061_ManagerShape_FinalFixed/REVIEW_MAU_VA_CAU_HOI.txt
+J1.S.P0070_TPBank/REVIEW_MAU_VA_CAU_HOI.txt
+J1.S.P0071_TaskManager/REVIEW_MAU_VA_CAU_HOI.txt
+J1.S.P0074_MatrixOOP/REVIEW_MAU_VA_CAU_HOI.txt
+J1.S.P0074_MatrixOOP/CAU_HOI_CHI_DOAN_CODE.txt   ← chi tiết chỉ đoạn code (nhân ma trận,...)
+
+Tổng số file source: 41
+Tổng số file review: 10

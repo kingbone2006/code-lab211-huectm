@@ -1,0 +1,101 @@
+================================================================================
+  REVIEW BÀI: J1.S.P0056 — Manager Worker (Salary)
+  Thư mục txt: Tổng Hợp txt / J1.S.P0056_ManagerWorker
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+A. GIỚI THIỆU NHANH
+────────────────────────────────────────────────────────────────────────────────
+
+"Bài quản lý công nhân và lịch sử thay đổi lương.
+entity: Worker, SalaryHistory, SalaryStatus (UP/DOWN).
+bo.Manager: addWorker, changeSalary, display list/history.
+ui.Main: menu. utils.Validator: nhập liệu."
+
+
+────────────────────────────────────────────────────────────────────────────────
+B. CẤU TRÚC
+────────────────────────────────────────────────────────────────────────────────
+
+entity/Worker.class.txt
+entity/SalaryHistory.class.txt
+entity/SalaryStatus.class.txt      — enum UP / DOWN
+bo/Manager.class.txt               — nghiệp vụ
+utils/Validator.class.txt
+ui/Main.class.txt
+
+
+────────────────────────────────────────────────────────────────────────────────
+C. LUỒNG NGHIỆP VỤ
+────────────────────────────────────────────────────────────────────────────────
+
+Thêm worker:
+  input Worker → Manager.addWorker
+    - null? throw
+    - id trùng (isExist)? throw
+    - add vào List<Worker>
+
+Đổi lương:
+  chọn UP/DOWN + code + amount
+  Manager.changeSalary(status, code, amount)
+    - list rỗng / không tìm thấy code / amount <= 0 → throw
+    - UP: salary += amount
+    - DOWN: salary -= amount (không cho < 0)
+    - add SalaryHistory(id, salary mới, status, date)
+
+Xem history / list worker: display methods
+
+
+────────────────────────────────────────────────────────────────────────────────
+D. METHOD — CHỈ CHỖ HAY HỎI
+────────────────────────────────────────────────────────────────────────────────
+
+getWorker(id)     — private, duyệt list equalsIgnoreCase id
+isExist(id)       — getWorker != null
+addWorker         — check trùng rồi add
+changeSalary      — ★ logic tăng/giảm + ghi history
+displaySalaryChangeHistory / displayWorkerList
+
+
+────────────────────────────────────────────────────────────────────────────────
+E. CÂU HỎI + ĐÁP ÁN
+────────────────────────────────────────────────────────────────────────────────
+
+Q1. SalaryStatus là gì?
+A: enum (hoặc tương đương) 2 trạng thái UP và DOWN — rõ nghĩa hơn boolean/int.
+
+Q2. changeSalary làm những bước nào?
+A: Validate list/code/amount → lấy Worker → switch UP/DOWN cập nhật salary
+   → new SalaryHistory → add vào histories.
+
+Q3. Giảm lương âm được không?
+A: Không — nếu salary - amount < 0 thì throw.
+
+Q4. Vì sao getWorker / isExist là private?
+A: Chỉ dùng nội bộ Manager, không expose ra UI — encapsulation.
+
+Q5. History lưu gì?
+A: id worker, mức lương (sau đổi), status UP/DOWN, ngày đổi.
+
+Q6. id trùng khi add?
+A: isExist → throw "already exists".
+
+Q7. Worker implements Serializable để làm gì?
+A: (Nếu có file .dat) hỗ trợ ghi/đọc object ra file nhị phân.
+
+Q8. Phân biệt workers và histories?
+A: workers = danh sách công nhân hiện tại;
+   histories = nhật ký mỗi lần đổi lương (có thể nhiều bản ghi / 1 worker).
+
+
+────────────────────────────────────────────────────────────────────────────────
+F. CHECKLIST
+────────────────────────────────────────────────────────────────────────────────
+
+[ ] Add worker → list hiện ra
+[ ] Up salary → history có UP
+[ ] Down quá số dư → báo lỗi
+[ ] Id trùng → báo lỗi
+
+
+================================================================================

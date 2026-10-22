@@ -1,0 +1,24 @@
+// ============================================================
+// File: Shape.class.txt
+// Project: J1.S.P0061_ManagerShape_FinalFixed
+// Package: entity
+// Mô tả: Mã nguồn Java (dạng text) — có comment giải thích phương thức.
+// ============================================================
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package entity;
+
+    public interface Shape {
+
+    void printResult();
+
+    double getPerimeter() throws Exception;
+
+    double getArea() throws Exception;
+    
+    public abstract void input();
+}

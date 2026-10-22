@@ -1,0 +1,71 @@
+// ============================================================
+// File: EastAsiaCountries.class.txt
+// Project: J1.S.P0052_ManagerContries_FinalUpdate
+// Package: model
+// Mô tả: Mã nguồn Java (dạng text) — có comment giải thích phương thức.
+// ============================================================
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package model;
+
+import java.util.ArrayList;
+import utils.Validator;
+
+public class EastAsiaCountries extends Country {
+
+    private String countryTerrain;
+
+    /**
+     * Constructor: khởi tạo đối tượng EastAsiaCountries.
+     */
+    public EastAsiaCountries() {
+    }
+
+    /**
+     * Constructor: khởi tạo đối tượng EastAsiaCountries.
+     */
+    public EastAsiaCountries(String countryCode, String countryName, double totalArea, String countryTerrain) {
+        super(countryCode, countryName, totalArea);
+        this.countryTerrain = countryTerrain;
+    }
+
+    /**
+     * Lấy địa hình quốc gia.
+     */
+    public String getCountryTerrain() {
+        return countryTerrain;
+    }
+
+    /**
+     * Gán địa hình quốc gia.
+     */
+    public void setCountryTerrain(String countryTerrain) {
+        if (countryTerrain == null || !countryTerrain.matches("([A-Za-z]+\\s?)+")) {
+            throw new IllegalArgumentException("Invalid Country Terrain. It must contain only letters and spaces.");
+        }
+        this.countryTerrain = countryTerrain;
+    }
+
+    @Override
+    /**
+     * Hiển thị dữ liệu (mảng / danh sách / đối tượng) ra màn hình.
+     */
+    public void display() {
+        System.out.printf("%-10s%-25s%-20.1f%-25s\n", super.getCountryCode(),
+                super.getCountryName(), super.totalArea, getCountryTerrain());
+    }
+
+    @Override
+    /**
+     * Nhập dữ liệu từ bàn phím cho đối tượng.
+     */
+    public void input() throws Exception {
+        super.input();
+        this.setCountryTerrain(Validator.getString("Enter terrain of country:\n",
+                "Invalid", "([A-Za-z]+\\s?)+"));
+    }
+}

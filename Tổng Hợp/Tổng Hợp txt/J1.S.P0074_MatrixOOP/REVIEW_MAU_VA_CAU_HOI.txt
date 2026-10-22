@@ -1,0 +1,419 @@
+================================================================================
+  FILE MẪU REVIEW BÀI: J1.S.P0074 — Matrix Calculator (OOP)
+  Mục đích: Ôn trước khi thầy/cô review code + câu hỏi hay gặp + gợi ý trả lời
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+PHẦN A. GIỚI THIỆU BÀI (nói 30–60 giây khi bắt đầu)
+────────────────────────────────────────────────────────────────────────────────
+
+"Bài em làm chương trình máy tính ma trận theo hướng đối tượng.
+
+- Package entity: class Matrix lưu dữ liệu ma trận (mảng 2 chiều int[][])
+  và các phép toán cộng, trừ, nhân.
+- Package utils: class Validator nhập số nguyên an toàn (kiểm tra khoảng, bắt lỗi).
+- Package ui: class Main hiển thị menu, nhập 2 ma trận, gọi phép toán và in kết quả.
+
+Người dùng chọn menu 1–4: cộng / trừ / nhân / thoát. Chương trình kiểm tra
+điều kiện kích thước ma trận trước khi tính; nếu không hợp lệ thì báo lỗi."
+
+
+────────────────────────────────────────────────────────────────────────────────
+PHẦN B. CẤU TRÚC PROJECT (nên chỉ được trên màn hình)
+────────────────────────────────────────────────────────────────────────────────
+
+src/
+├── entity/
+│   └── Matrix.java          // Dữ liệu + phép toán (core)
+├── utils/
+│   └── Validator.java       // Nhập/validate số nguyên
+└── ui/
+    └── Main.java            // Menu + luồng chạy
+
+Nguyên tắc OOP:
+  - Tách UI (Main) khỏi business (Matrix)
+  - Validator dùng static, constructor private → utility class
+  - Matrix đóng gói data (private int[][] data), thao tác qua method
+
+
+────────────────────────────────────────────────────────────────────────────────
+PHẦN C. LUỒNG CHẠY CHƯƠNG TRÌNH (FLOW)
+────────────────────────────────────────────────────────────────────────────────
+
+  [Start]
+     │
+     v
+  Vòng lặp while(true) — hiện menu
+     │
+     ├─ 1. Addition      ──► input matrix1, input matrix2 ──► Matrix.add
+     ├─ 2. Subtraction   ──► input matrix1, input matrix2 ──► Matrix.subtract
+     ├─ 3. Multiplication──► input matrix1, input matrix2 ──► Matrix.multiply
+     └─ 4. Quit          ──► System.exit(0)
+     │
+     v
+  In: matrix1  (+|-|*)  matrix2  =  result
+  (nếu Exception → in e.getMessage())
+
+
+────────────────────────────────────────────────────────────────────────────────
+PHẦN D. GIẢI THÍCH KỸ TỪNG PHÉP TOÁN (hay bị hỏi sâu)
+────────────────────────────────────────────────────────────────────────────────
+
+### 1) CỘNG MA TRẬN — add()
+
+Điều kiện:
+  - Số hàng A = số hàng B
+  - Số cột  A = số cột  B
+  - Không cùng size → throw Exception("Rows and cols two matrix must be same")
+
+Công thức:
+  C[i][j] = A[i][j] + B[i][j]
+
+Kích thước kết quả: giống A và B.
+
+Ví dụ nói trước thầy:
+  A = [1 2]     B = [5 6]     C = [6  8]
+      [3 4]         [7 8]         [10 12]
+
+Code cốt lõi:
+  result.data[i][j] = this.data[i][j] + other.data[i][j];
+
+
+### 2) TRỪ MA TRẬN — subtract()
+
+Điều kiện: giống cộng (cùng kích thước).
+
+Công thức:
+  C[i][j] = A[i][j] - B[i][j]
+
+Lưu ý: A − B ≠ B − A (không giao hoán).
+
+
+### 3) NHÂN MA TRẬN — multiply()  ★ hay hỏi nhất
+
+Điều kiện (KHÁC cộng/trừ):
+  - Số CỘT của A  =  Số HÀNG của B
+  - A là (m × n), B là (n × p)  →  n phải bằng nhau
+  - Kết quả C là (m × p)
+
+Công thức phần tử C[i][j]:
+  C[i][j] = Σ (k=0 → n-1)  A[i][k] * B[k][j]
+  (tích vô hướng: hàng i của A  ×  cột j của B)
+
+Code cốt lõi (3 vòng for):
+  for i = 0 .. rowsA-1          // hàng kết quả
+    for j = 0 .. colsB-1        // cột kết quả
+      for k = 0 .. colsA-1      // cộng dồn
+        result[i][j] += A[i][k] * B[k][j];
+
+Ví dụ nói trước thầy:
+  A (2×3):  1 2 3      B (3×2):  7  8
+            4 5 6               9 10
+                               11 12
+
+  C[0][0] = 1*7 + 2*9 + 3*11 = 58
+  C[0][1] = 1*8 + 2*10 + 3*12 = 64
+  C[1][0] = 4*7 + 5*9 + 6*11 = 139
+  C[1][1] = 4*8 + 5*10 + 6*12 = 154
+
+  Kết quả (2×2):
+    [58][64]
+    [139][154]
+
+Bảng so sánh nhanh (nên thuộc):
+
+  | Tiêu chí           | Cộng / Trừ              | Nhân                        |
+  |--------------------|-------------------------|-----------------------------|
+  | Điều kiện size     | Cùng hàng VÀ cùng cột   | Cột A = Hàng B              |
+  | Size kết quả       | Giống A, B              | Hàng A × Cột B              |
+  | Giao hoán          | A+B = B+A               | A×B thường ≠ B×A            |
+  | Cách tính 1 ô      | Cộng/trừ đúng vị trí    | Tổng tích hàng × cột        |
+
+
+────────────────────────────────────────────────────────────────────────────────
+PHẦN E. GIẢI THÍCH CÁC METHOD CHÍNH (đọc code theo thứ tự này)
+────────────────────────────────────────────────────────────────────────────────
+
+[Matrix.java]
+
+1. setSize(rows, cols)
+   - Tạo mảng data = new int[rows][cols]
+   - Không cho rows/cols âm
+
+2. getRows() / getCols()
+   - Lấy số hàng / số cột; nếu data null thì trả 0
+   - getCols lấy data[0].length (giả định ma trận hình chữ nhật đầy đủ)
+
+3. input(numberOfMatrix)
+   - Hỏi số hàng, số cột (> 0)
+   - Gọi setSize
+   - Duyệt từng ô, nhập giá trị int (dùng Validator)
+
+4. add / subtract / multiply  (non-static)
+   - this là ma trận 1, other là ma trận 2
+   - Kiểm tra điều kiện → tạo result → tính → return
+
+5. add / subtract / multiply  (static)
+   - Matrix.add(m1, m2) chỉ gọi m1.add(m2)
+   - Mục đích: gọi tiện từ Main, tái sử dụng logic non-static (tránh copy code)
+
+6. toString()
+   - In dạng [giá_trị] từng hàng, xuống dòng giữa các hàng
+
+
+[Validator.java]
+
+- getInt(message, errRange, errNumber, min, max)
+  - In message → đọc 1 dòng → parseInt
+  - Trong [min, max] thì return
+  - NumberFormatException → báo errNumber
+  - Ngoài khoảng → báo errRange
+  - Lặp do-while(true) đến khi hợp lệ
+- Constructor private: không cho new Validator() (utility class)
+
+
+[Main.java]
+
+- Vòng menu vô hạn
+- Mỗi case: input 2 ma trận → gọi static method → in theo dạng
+    matrix1
+    +
+    matrix2
+    =
+    result
+- try-catch để bắt Exception từ điều kiện size sai
+
+
+────────────────────────────────────────────────────────────────────────────────
+PHẦN F. CÂU HỎI THẦY/CÔ HAY HỎI + GỢI Ý TRẢ LỜI
+────────────────────────────────────────────────────────────────────────────────
+
+========== NHÓM 1: TỔNG QUAN / YÊU CẦU BÀI ==========
+
+Q1. Bài này làm gì?
+A: Chương trình calculator cho ma trận: cộng, trừ, nhân 2 ma trận số nguyên,
+   có validate input và kiểm tra điều kiện kích thước trước khi tính.
+
+Q2. Vì sao tách package entity / utils / ui?
+A: Tách trách nhiệm (separation of concerns):
+   - entity: nghiệp vụ + dữ liệu
+   - utils: tiện ích nhập liệu tái sử dụng
+   - ui: giao diện console / điều khiển luồng
+   Dễ bảo trì, dễ test, đúng tinh thần OOP.
+
+Q3. Vì sao dùng OOP mà không viết hết trong main?
+A: Ma trận là một "đối tượng" có thuộc tính (data) và hành vi (add, multiply...).
+   Đóng gói giúp tái sử dụng, mở rộng (sau này thêm định thức, chuyển vị...)
+   mà không phải sửa rải rác trong main.
+
+
+========== NHÓM 2: DỮ LIỆU & THIẾT KẾ CLASS ==========
+
+Q4. Vì sao dùng int[][] mà không dùng ArrayList?
+A: Ma trận có kích thước cố định sau khi nhập, truy cập theo chỉ số [i][j]
+   tự nhiên; mảng 2 chiều đơn giản, hiệu năng tốt, đủ cho yêu cầu bài.
+
+Q5. data là private — tại sao?
+A: Encapsulation. Không cho bên ngoài sửa lung tung mảng.
+   Muốn thao tác phải qua method (setSize, input, add...) để kiểm soát hợp lệ.
+
+Q6. getData() trả về trực tiếp data — có vấn đề gì không?
+A: (Trả lời trung thực nếu bị hỏi)
+   Có điểm yếu: trả reference gốc → bên ngoài có thể sửa data[i][j] bypass
+   validation. Cách tốt hơn: return bản copy (clone) hoặc không public getData
+   nếu không cần. (Nếu thầy khen/chê — nhận và nói hướng cải thiện.)
+
+Q7. Constructor của Matrix ở đâu? data ban đầu null?
+A: Không viết constructor tường minh → Java cung cấp default constructor.
+   data = null cho đến khi setSize/input/setData. getRows/getCols đã xử lý null.
+
+
+========== NHÓM 3: PHÉP TOÁN (HỎI RẤT KỸ) ==========
+
+Q8. Điều kiện cộng hai ma trận là gì?
+A: Cùng số hàng và cùng số cột.
+
+Q9. Điều kiện nhân hai ma trận là gì? Kết quả size bao nhiêu?
+A: Cột ma trận 1 = Hàng ma trận 2.
+   Kết quả: (hàng ma trận 1) × (cột ma trận 2).
+
+Q10. Em giải thích 3 vòng for trong multiply?
+A:
+   - i: duyệt hàng của kết quả (= hàng A)
+   - j: duyệt cột của kết quả (= cột B)
+   - k: duyệt để cộng dồn A[i][k] * B[k][j]
+   Mỗi C[i][j] là tích vô hướng hàng i của A với cột j của B.
+
+Q11. Cho 2 ma trận 2×3, có nhân được không?
+A: Không. Cột A = 3, hàng B = 2 → 3 ≠ 2. Muốn nhân được B phải có 3 hàng
+   (ví dụ 3×n).
+
+Q12. A×B có bằng B×A không?
+A: Nói chung không. Thậm chí B×A có thể không hợp lệ về size
+   (nếu A 2×3, B 3×2 thì A×B = 2×2 được, B×A = 3×3 cũng được nhưng kết quả khác).
+
+Q13. Vì sao cộng/trừ check rows & cols, còn nhân chỉ check colsA == rowsB?
+A: Vì bản chất toán học khác nhau:
+   - Cộng/trừ: từng phần tử cùng vị trí → phải cùng hình dạng.
+   - Nhân: hàng × cột → chỉ cần chiều "trong" khớp (colsA = rowsB).
+
+Q14. result.data[i][j] += ...  — ban đầu result bằng mấy?
+A: setSize tạo new int[rows][cols] → Java khởi tạo int = 0.
+   Dùng += để cộng dồn qua vòng k là đúng.
+
+
+========== NHÓM 4: STATIC VS NON-STATIC ==========
+
+Q15. add non-static và add static khác nhau thế nào? Để làm gì?
+A:
+   - Non-static: matrix1.add(matrix2) — gắn với object this.
+   - Static: Matrix.add(m1, m2) — gọi qua tên class, bên trong gọi m1.add(m2).
+   Mục đích: Main gọi gọn, logic chỉ viết 1 lần (DRY — Don't Repeat Yourself).
+
+Q16. Có thể bỏ static, chỉ để non-static không?
+A: Có, Main gọi matrix1.add(matrix2) trực tiếp vẫn đúng.
+
+
+========== NHÓM 5: VALIDATE & XỬ LÝ LỖI ==========
+
+Q17. Validator xử lý input sai thế nào?
+A: try-parse Integer.parseInt; catch NumberFormatException in lỗi;
+   nếu ngoài [min,max] in lỗi range; lặp đến khi đúng.
+
+Q18. Vì sao Scanner để static final?
+A: Dùng chung 1 Scanner cho System.in trong suốt chương trình,
+   tránh mở nhiều Scanner trên cùng System.in (dễ lỗi/đóng nhầm stream).
+
+Q19. Exception trong add/multiply được xử lý ở đâu?
+A: Method ném throws Exception; Main bọc try-catch, in e.getMessage()
+   → user thấy lỗi rõ, chương trình không crash, quay lại menu.
+
+Q20. Phân biệt IllegalArgumentException (setSize) và Exception (add)?
+A:
+   - setSize: lỗi lập trình / tham số âm → IllegalArgumentException (unchecked-ish usage)
+   - add/multiply: lỗi nghiệp vụ khi user nhập 2 ma trận không tương thích
+     → Exception, Main chủ động catch để thông báo.
+
+
+========== NHÓM 6: OOP / CLEAN CODE ==========
+
+Q21. Encapsulation / Inheritance / Polymorphism bài này dùng gì?
+A:
+   - Encapsulation: private data, public method.
+   - Inheritance/Polymorphism: bài này gần như chưa dùng (không có class con).
+     (Nếu bị hỏi mở rộng: có thể abstract MatrixOperation, strategy pattern...)
+
+Q22. toString() override để làm gì?
+A: In ma trận đẹp khi System.out.print(matrix); chuẩn Java (Object.toString).
+
+Q23. Có thể cải thiện gì thêm?
+A: (chọn 2–3 ý, đừng nói dài)
+   1. getData() nên trả copy, không trả reference gốc.
+   2. Có thể tách method printResult(m1, op, m2, result) tránh lặp code 3 case.
+   3. Thêm phép chuyển vị, định thức (nếu yêu cầu mở rộng).
+   4. Dùng custom exception (MatrixSizeException) thay Exception chung.
+   5. Kiểm tra ma trận "ragged" (hàng lệch cột) — hiện giả định hình chữ nhật.
+
+
+========== NHÓM 7: DEMO / TÌNH HUỐNG THỰC TẾ ==========
+
+Q24. Thầy cho test case — em demo miệng:
+
+Case cộng OK:
+  M1: 2×2 → 1 2 / 3 4
+  M2: 2×2 → 5 6 / 7 8
+  Kỳ vọng: 6 8 / 10 12
+
+Case cộng FAIL:
+  M1: 2×2 , M2: 2×3 → báo "Rows and cols two matrix must be same"
+
+Case nhân OK:
+  M1: 2×3 , M2: 3×2 → ra 2×2 (tính như phần D)
+
+Case nhân FAIL:
+  M1: 2×3 , M2: 2×3 → báo "Cols of matrix 1 must be equal rows of matrix 2"
+
+Q25. Nhập chữ "abc" khi đang hỏi số?
+A: Validator bắt NumberFormatException, in "Please enter integer number",
+   bắt nhập lại, không dừng chương trình.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PHẦN G. ĐOẠN CODE NÊN THUỘC / CHỈ ĐƯỢC KHI BỊ HỎI
+────────────────────────────────────────────────────────────────────────────────
+
+// Kiểm tra cộng
+if (this.getRows() != other.getRows() || this.getCols() != other.getCols())
+    throw new Exception("Rows and cols two matrix must be same");
+
+// Kiểm tra nhân
+if (this.getCols() != other.getRows())
+    throw new Exception("Cols of matrix 1 must be equal rows of matrix 2");
+
+// Nhân — 3 vòng for
+result.data[i][j] += this.data[i][k] * other.data[k][j];
+
+// Size kết quả nhân
+result.setSize(this.getRows(), other.getCols());  // m × p
+
+
+────────────────────────────────────────────────────────────────────────────────
+PHẦN H. SCRIPT NÓI MẪU KHI REVIEW (2–3 PHÚT)
+────────────────────────────────────────────────────────────────────────────────
+
+"Em xin trình bày bài Matrix Calculator.
+
+Thứ nhất về cấu trúc: em chia 3 package — entity chứa class Matrix,
+utils chứa Validator, ui chứa Main. Mục tiêu là tách giao diện và nghiệp vụ.
+
+Thứ hai về dữ liệu: ma trận lưu bằng int[][] private, có setSize, getRows,
+getCols, input để nhập từ bàn phím có validate.
+
+Thứ ba về phép toán:
+- Cộng và trừ yêu cầu hai ma trận cùng kích thước, cộng/trừ từng phần tử.
+- Nhân yêu cầu số cột ma trận 1 bằng số hàng ma trận 2; mỗi phần tử kết quả
+  là tổng tích hàng i nhân cột j. Kết quả có size hàng1 × cột2.
+
+Em viết cả bản non-static và static; static gọi lại non-static để không lặp code.
+Main dùng menu, try-catch in lỗi nếu size không hợp lệ.
+
+Em xin demo / sẵn sàng trả lời câu hỏi ạ."
+
+
+────────────────────────────────────────────────────────────────────────────────
+PHẦN I. CHECKLIST TRƯỚC KHI VÀO REVIEW
+────────────────────────────────────────────────────────────────────────────────
+
+[ ] Chạy được chương trình, menu 1–4 hoạt động
+[ ] Thử 1 case cộng đúng + 1 case cộng sai size
+[ ] Thử 1 case nhân đúng (2×3 * 3×2) + 1 case nhân sai
+[ ] Nhập sai kiểu (chữ) → bị bắt nhập lại
+[ ] Giải thích được 3 vòng for nhân
+[ ] Nói được khác biệt điều kiện cộng vs nhân
+[ ] Nói được static add vs non-static add
+[ ] Biết chỉ vị trí throw Exception trong Matrix.java
+[ ] Biết Validator nằm package utils, làm gì
+[ ] Chuẩn bị 1–2 điểm cải thiện nếu thầy hỏi "em thấy code còn gì chưa tốt?"
+
+
+────────────────────────────────────────────────────────────────────────────────
+PHẦN J. BẢNG THUẬT NGỮ NHANH (nếu thầy hỏi tiếng Anh)
+────────────────────────────────────────────────────────────────────────────────
+
+matrix              = ma trận
+row / column        = hàng / cột
+element             = phần tử
+addition            = phép cộng
+subtraction         = phép trừ
+multiplication      = phép nhân
+dimension / size    = kích thước
+validate / input    = kiểm tra / nhập liệu
+exception           = ngoại lệ
+encapsulation       = đóng gói
+utility class       = lớp tiện ích (static methods)
+
+
+================================================================================
+  Hết file mẫu. In ra hoặc mở song song khi ôn.
+  File nằm tại: J1.S.P0074_MatrixOOP\REVIEW_MAU_VA_CAU_HOI.txt
+================================================================================

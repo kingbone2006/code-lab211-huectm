@@ -1,0 +1,74 @@
+// ============================================================
+// File: Validate.class.txt
+// Project: J1.S.P0070_TPBank
+// Package: utils
+// Mô tả: Mã nguồn Java (dạng text) — có comment giải thích phương thức.
+// ============================================================
+
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package utils;
+
+import java.util.Scanner;
+public class Validate {
+
+    private static final Scanner SCANNER = new Scanner(System.in);
+
+    /**
+     * Constructor: khởi tạo đối tượng Validate.
+     */
+    private Validate() {
+    }
+
+    /**
+     * Nhập số nguyên trong khoảng [min, max], lặp đến khi hợp lệ.
+     */
+    public static int getInt(String messageInfo, String messsageErrorOutOfRange,
+            String messageErrorNumber, int min, int max) {
+        do {
+            try {
+                System.out.print(messageInfo);
+                int number = Integer.parseInt(SCANNER.nextLine().trim());
+                if (number >= min && number <= max) {
+                    return number;
+                } else {
+                    System.out.println(messsageErrorOutOfRange);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println(messageErrorNumber);
+            }
+        } while (true);
+    }
+
+    /**
+     * Nhập chuỗi từ bàn phím, lặp đến khi khớp regex.
+     */
+    public static String getString(String messageInfo, String messageError, final String REGEX) {
+        do {
+            System.out.print(messageInfo);
+            String str = SCANNER.nextLine().trim();
+            if (str.matches(REGEX)) {
+                return str;
+            }
+            System.out.println(messageError);
+        } while (true);
+    }
+
+    /**
+     * Kiểm tra captcha người dùng nhập có khớp với captcha đã sinh.
+     */
+    public static boolean verifyCaptcha(String message, String messageError, String captchaGenerate) {
+        String captchaInput;
+        while (true) {
+            System.out.printf(message);
+            captchaInput = SCANNER.nextLine().trim();
+            if (captchaGenerate.equals(captchaInput)) {
+                break;
+            }
+            System.out.println(messageError);
+        }
+        return true;
+    }
+}

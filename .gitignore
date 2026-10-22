@@ -1,0 +1,33 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+!pass lab.zip
+
+# Virtual machine crash logs
+hs_err_pid*
+replay_pid*
+
+# NetBeans
+**/build/
+**/dist/
+**/nbproject/private/
+
+# OS generated files
+Thumbs.db
+[Dd]esktop.ini
+.DS_Store
